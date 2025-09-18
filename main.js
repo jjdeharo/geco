@@ -629,13 +629,6 @@ function generarEquipos() {
   listaAlumnosA = listaAlumnosA.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
   listaAlumnosB = listaAlumnosB.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
   listaAlumnosC = listaAlumnosC.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
-  if (tipoGrupo === 'homogeneos') {
-    const mezclaTipos = incompatSets.some(set => new Set(set.map(alumno => alumno.tipo)).size > 1);
-    if (mezclaTipos) {
-      alert(t('errors.homogeneousMixed'));
-      return null;
-    }
-  }
   const totalOriginal = totalAlumnos;
   let resultado;
   if (tipoGrupo === 'heterogeneos') {
