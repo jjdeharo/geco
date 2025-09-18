@@ -197,10 +197,7 @@
     
     <div class="header-container">
       <a href="index.html" class="nav-link" id="back-link">Volver a GeCo</a>
-      <div class="language-switcher">
-        <button id="es-btn" class="lang-btn active">ES</button>
-        <button id="ca-btn" class="lang-btn">CA</button>
-      </div>
+      <div class="language-switcher" id="languageSwitcher"></div>
     </div>
 
     <div class="card">
@@ -270,11 +267,12 @@
     // Definir los textos para ambos idiomas
     const translations = {
       es: {
+        label: 'ES',
         title: "Guía de GeCo",
         backLink: "Volver a GeCo",
         introText: "El programa GeCo facilita la formación de equipos de alumnos para el trabajo cooperativo, promoviendo la diversidad y mejorando la colaboración. La composición de los equipos puede ser <strong>heterogénea</strong>, <strong>homogénea</strong> o <strong>temporal</strong> según el objetivo del aprendizaje.",
         justificationTitle: "Justificación teórica para la creación de equipos homogéneos y heterogéneos",
-        distributionText: "Para formar equipos, hay que distribuir a los estudiantes en tres subgrupos (tipologías A, B y C en este programa), según la propuesta de <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>, cada grupo de 4 personas constará de los siguientes miembros:",
+        distributionText: "Para formar equipos, hay que distribuir a los estudiantes en tres subgrupos (tipologías A, B y C en este programa), según la propuesta de <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>. Cada grupo de 4 personas constará de los siguientes miembros:",
         memberList: [
           "A: Una persona con capacidad para ayudar.",
           "B: Un par de miembros que sean más o menos autónomos.",
@@ -305,11 +303,12 @@
         licenseText: "Esta obra está bajo una licencia <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>"
       },
       ca: {
+        label: 'CA',
         title: "Guia de GeCo",
         backLink: "Tornar a GeCo",
         introText: "El programa GeCo facilita la formació d'equips d'alumnes per al treball cooperatiu, promovent la diversitat i millorant la col·laboració. La composició dels equips pot ser <strong>heterogènia</strong>, <strong>homogènia</strong> o <strong>temporal</strong> segons l'objectiu de l'aprenentatge.",
         justificationTitle: "Justificació teòrica per a la creació d'equips homogenis i heterogenis",
-        distributionText: "Per formar equips, cal distribuir els estudiants en tres subgrups (tipologies A, B i C en aquest programa), segons la proposta de <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>, cada grup de 4 persones constarà dels següents membres:",
+        distributionText: "Per formar equips, cal distribuir els estudiants en tres subgrups (tipologies A, B i C en aquest programa), segons la proposta de <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>. Cada grup de 4 persones constarà dels següents membres:",
         memberList: [
           "A: Una persona amb capacitat per ajudar.",
           "B: Un parell de membres que siguin més o menys autònoms.",
@@ -338,84 +337,207 @@
         labText: "Laboratori d'aplicacions educatives <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
         authorText: "Aplicació feta per <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
         licenseText: "Aquesta obra està sota una llicència <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>"
+      },
+      gl: {
+        label: 'GL',
+        title: "Guía de GeCo",
+        backLink: "Volver a GeCo",
+        introText: "O programa GeCo facilita a formación de equipos de alumnado para o traballo cooperativo, promovendo a diversidade e mellorando a colaboración. A composición dos equipos pode ser <strong>heteroxénea</strong>, <strong>homoxénea</strong> ou <strong>temporal</strong> segundo o obxectivo da aprendizaxe.",
+        justificationTitle: "Xustificación teórica para a creación de equipos homoxéneos e heteroxéneos",
+        distributionText: "Para formar equipos cómpre distribuír o alumnado en tres subgrupos (tipoloxías A, B e C neste programa), segundo a proposta de <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>. Cada grupo de 4 persoas incluirá:",
+        memberList: [
+          "A: Unha persoa con capacidade para axudar.",
+          "B: Dúas persoas máis ou menos autónomas.",
+          "C: Unha persoa que precisa apoio."
+        ],
+        idealSize: "O tamaño ideal dos equipos cooperativos é de 4 integrantes. Se non é posible facer grupos de 4, pueden facerse de 3 ou de 5, pero nunca máis grandes.",
+        heterogeneousTitle: "Equipos heteroxéneos (equipos base)",
+        heterogeneousText: "Son grupos que duran todo o curso ou un trimestre. Favorecen a aprendizaxe de novos contidos e créanse asegurando que en cada equipo aparezan as tres tipoloxías (A, B e C).",
+        homogeneousTitle: "Equipos homoxéneos (semellantes)",
+        homogeneousText: "Formados por alumnado con características semellantes, son axeitados para reforzar coñecementos xa adquiridos. O programa tenta que cada equipo sexa dunha soa tipoloxía, aínda que pode haber mesturas cando os números non cadran.",
+        temporaryTitle: "Equipos temporais (aleatorios)",
+        temporaryText: "Formanse para tarefas curtas ou cando o profesorado aínda non coñece o alumnado. Úsanse especialmente a comezos de curso ou para actividades rápidas. Todos os equipos son uniformes e os alumnos asígnanse ao azar, polo que as etiquetas A, B e C pérdense.",
+        howtoTitle: "Como utilizar GeCo",
+        gecoIntro: "GeCo crea equipos aleatorios en función das condicións definidas polo profesorado.",
+        introNames: "Introducir os nomes do alumnado",
+        typicallyText: "Habitualmente as listas cúbrense do seguinte xeito:",
+        typeA: "Tipoloxía A: Persoas autónomas que non precisan apoio.",
+        typeB: "Tipoloxía B: Persoas que traballan con autonomía pero precisan axuda puntual (a maioría).",
+        typeC: "Tipoloxía C: Persoas que precisan apoio para progresar.",
+        otherGroups: "Evidentemente pódense facer outras agrupacións; por exemplo, para unha actividade de xadrez poderiamos colocar en A quen xa sabe xogar, en B quen só coñece os movementos e en C quen non coñece o xogo.",
+        membersNumber: "<strong>Definir o número de persoas por equipo</strong>. Se a división non é exacta, algún equipo terá un tamaño diferente.",
+        teamType: "<strong>Escoller o tipo de equipo</strong>: heteroxéneo, homoxéneo ou aleatorio.",
+        leftoverMembers: "<strong>Decidir que facer co alumnado sobrante</strong>. Como o total rara vez coincide, pódese engadir ao azar noutros equipos ou crear un equipo novo.",
+        generateButton: "Preme <strong>Xerar equipos</strong> para obtelos. Cada vez que se preme xérase unha nova distribución.",
+        goToGeco: "Ir a GeCo",
+        labText: "Laboratorio de aplicacións educativas <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
+        authorText: "Aplicación creada por <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
+        licenseText: "Esta obra está baixo unha licenza <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>"
+      },
+      eu: {
+        label: 'EU',
+        title: "GeCo gida",
+        backLink: "Itzuli GeCora",
+        introText: "GeCo programak ikasleen talde kooperatiboak sortzea errazten du, aniztasuna eta lankidetza sustatuz. Taldeen osaera <strong>heterogeneoa</strong>, <strong>homogeneoa</strong> edo <strong>aldi baterakoa</strong> izan daiteke ikasketa helburuaren arabera.",
+        justificationTitle: "Talde homogeneo eta heterogeneoen oinarri teorikoa",
+        distributionText: "Taldeak osatzeko, ikasleak hiru azpitaldetan (A, B eta C tipologiak) banatzen dira, <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a> proposamenari jarraituz. Lau kideko talde bakoitzak honakoak izango ditu:",
+        memberList: [
+          "A: Besteak laguntzeko gaitasuna duen ikasle bat.",
+          "B: Nahiko autonomoak diren bi kide.",
+          "C: Laguntza behar duen ikasle bat."
+        ],
+        idealSize: "Talde kooperatiboetarako tamaina egokiena 4 kidekoa da. Hala ezin bada, taldeak 3 edo 5 kidekoak izan daitezke, baina ez handiagoak.",
+        heterogeneousTitle: "Talde heterogeneoak (oinarrizko taldeak)",
+        heterogeneousText: "Kurtso osoan edo hiruhileko batean mantentzen diren taldeak dira. Ezagutza berriak ikastea errazten dute eta hiru tipologiak (A, B eta C) talde bakoitzean egotea bilatzen da.",
+        homogeneousTitle: "Talde homogeneoak (antzekoak)",
+        homogeneousText: "Antzeko ezaugarriak dituzten pertsonez osatuta daude eta aurrez ikasitako edukiak sendotzeko egokiak dira. Taldeak tipologia bereko ikasleekin osatzen saiatzen da, baina askotan zenbakiak ez datozenez bat, tipologia nahasiak ager daitezke.",
+        temporaryTitle: "Aldi baterako taldeak (ausazkoak)",
+        temporaryText: "Epe laburreko jardueretarako edo irakasleak oraindik ikasleak ezagutzen ez dituenean erabiltzen dira, ikasturte hasieran bereziki. Taldeak uniformea dira eta ikasleak ausaz esleitzen dira, beraz A, B eta C etiketek ez dute zentzurik.",
+        howtoTitle: "Nola erabili GeCo",
+        gecoIntro: "GeCok irakasleak definitutako baldintzetan oinarrituta sortzen ditu taldeak.",
+        introNames: "Idatzi ikasleen izenak",
+        typicallyText: "Orokorrean, zerrendak honela betetzen dira:",
+        typeA: "A tipologia: Autonomoak eta laguntzarik behar ez duten pertsonak.",
+        typeB: "B tipologia: Bere kabuz lan egiten duten baina noizbehinka laguntza behar dutenak (gehienak).",
+        typeC: "C tipologia: Aurrera egiteko laguntza behar dutenak.",
+        otherGroups: "Jakina, beste sailkapen batzuk ere erabil daitezke; esaterako, xake jarduera baterako A taldean jada jokatzen dakitenak jarri, B taldean mugimenduak besterik ez dakitenak eta C taldean erabat berriak direnak.",
+        membersNumber: "<strong>Zehaztu taldeko kide kopurua</strong>. Zatiketa ez bada zehatza, talde batek baino gehiagok neurri desberdina izango du.",
+        teamType: "<strong>Aukeratu taldeen mota</strong>: heterogeneoa, homogeneoa edo ausazkoa.",
+        leftoverMembers: "<strong>Erabaki zer egin soberan geratzen direnekin</strong>. Guztizko kopurua ez datorrenean bat, ausaz gainerako taldeen artean bana daitezke edo talde berri bat sor daiteke.",
+        generateButton: "Sakatu <strong>Taldeak sortu</strong> botoia. Botoia sakatzen den bakoitzean banaketa berria lortzen da.",
+        goToGeco: "Joan GeCora",
+        labText: "Hezkuntza-aplikazioen laborategia <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
+        authorText: "Aplikazioa <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>-k egina",
+        licenseText: "Lan hau <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a> lizentziapean dago"
+      },
+      en: {
+        label: 'EN',
+        title: "GeCo Guide",
+        backLink: "Back to GeCo",
+        introText: "The GeCo program helps teachers create cooperative student teams, promoting diversity and improving collaboration. Teams can be <strong>heterogeneous</strong>, <strong>homogeneous</strong>, or <strong>temporary</strong> depending on the learning goal.",
+        justificationTitle: "Theoretical justification for heterogeneous and homogeneous teams",
+        distributionText: "To build teams, split the students into three subgroups (typologies A, B and C in this tool) following the proposal by <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>. Every group of four should contain:",
+        memberList: [
+          "A: A student who can support peers.",
+          "B: Two fairly autonomous students.",
+          "C: A student who needs support."
+        ],
+        idealSize: "The ideal size for cooperative teams is four members. If that is not possible, use teams of three or five, but never larger.",
+        heterogeneousTitle: "Heterogeneous teams (base teams)",
+        heterogeneousText: "These groups usually last a term or the whole year. They favour new learning and ensure that each team includes the three typologies (A, B and C).",
+        homogeneousTitle: "Homogeneous teams (similar)",
+        homogeneousText: "They group students with similar characteristics and are appropriate to consolidate previously learned content. The tool tries to keep all members within the same typology (A, B or C). Because numbers seldom match perfectly, some teams may mix typologies.",
+        temporaryTitle: "Temporary teams (random)",
+        temporaryText: "These teams are created for short tasks or when the teacher does not yet know the class. They are especially useful at the beginning of the year or for quick activities. All teams are uniform because students are assigned randomly, so the A, B, C labels are ignored.",
+        howtoTitle: "How to use GeCo",
+        gecoIntro: "GeCo builds random teams according to the conditions defined by the teacher.",
+        introNames: "Enter the student names",
+        typicallyText: "Typically the lists are filled as follows:",
+        typeA: "Typology A: Autonomous students who do not need support.",
+        typeB: "Typology B: Students who work independently with occasional help (the majority).",
+        typeC: "Typology C: Students who need support to progress.",
+        otherGroups: "You can, of course, use other groupings. For example, for a chess activity you might place experienced players in A, those who only know the moves in B, and complete beginners in C.",
+        membersNumber: "<strong>Set the number of students per team</strong>. If the division is not exact, some teams will end up with a different size.",
+        teamType: "<strong>Select the team type</strong>: heterogeneous, homogeneous, or random.",
+        leftoverMembers: "<strong>Decide what to do with leftover students</strong>. Because the total rarely divides evenly, you can add them randomly to existing teams or create a new team with them.",
+        generateButton: "Click <strong>Generate teams</strong> to create them. Each click produces a new distribution.",
+        goToGeco: "Go to GeCo",
+        labText: "Educational Applications Lab <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
+        authorText: "Application by <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
+        licenseText: "This work is licensed under <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>"
       }
     };
 
-    // Función para detectar el idioma del navegador
+    const languageOrder = ['es', 'ca', 'gl', 'eu', 'en'];
+    const DEFAULT_LANGUAGE = 'es';
+    let currentLanguage = DEFAULT_LANGUAGE;
+
     function detectBrowserLanguage() {
-      const userLang = navigator.language || navigator.userLanguage;
-      return userLang.startsWith('ca') ? 'ca' : 'es';
+      const userLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+      const match = languageOrder.find(code => userLang.startsWith(code));
+      return match || DEFAULT_LANGUAGE;
     }
 
-    // Función para establecer el idioma
-    function setLanguage(lang) {
-      // Actualizar clases de los botones
-      document.getElementById('es-btn').classList.toggle('active', lang === 'es');
-      document.getElementById('ca-btn').classList.toggle('active', lang === 'ca');
-      
-      // Actualizar textos
-      document.getElementById('title').innerText = translations[lang].title;
-      document.getElementById('back-link').innerText = translations[lang].backLink;
-      document.getElementById('intro-text').innerHTML = translations[lang].introText;
-      document.getElementById('justification-title').innerText = translations[lang].justificationTitle;
-      document.getElementById('distribution-text').innerHTML = translations[lang].distributionText;
-      
-      // Actualizar lista de miembros
+    function buildLanguageSwitcher() {
+      const container = document.getElementById('languageSwitcher');
+      if (!container) return;
+      container.innerHTML = '';
+      languageOrder.filter(code => translations[code]).forEach(code => {
+        const btn = document.createElement('button');
+        btn.className = 'lang-btn';
+        btn.textContent = translations[code].label || code.toUpperCase();
+        if (code === currentLanguage) {
+          btn.classList.add('active');
+        }
+        btn.addEventListener('click', () => {
+          if (code !== currentLanguage) {
+            setLanguage(code);
+          }
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    function applyTranslations() {
+      const langData = translations[currentLanguage] || translations[DEFAULT_LANGUAGE];
+      document.getElementById('title').innerText = langData.title;
+      document.getElementById('back-link').innerText = langData.backLink;
+      document.getElementById('intro-text').innerHTML = langData.introText;
+      document.getElementById('justification-title').innerText = langData.justificationTitle;
+      document.getElementById('distribution-text').innerHTML = langData.distributionText;
+
       const memberList = document.getElementById('member-list');
       memberList.innerHTML = '';
-      translations[lang].memberList.forEach(item => {
+      langData.memberList.forEach(item => {
         const li = document.createElement('li');
         li.innerHTML = item;
         memberList.appendChild(li);
       });
-      
-      document.getElementById('ideal-size').innerText = translations[lang].idealSize;
-      document.getElementById('heterogeneous-title').innerText = translations[lang].heterogeneousTitle;
-      document.getElementById('heterogeneous-text').innerText = translations[lang].heterogeneousText;
-      document.getElementById('homogeneous-title').innerText = translations[lang].homogeneousTitle;
-      document.getElementById('homogeneous-text').innerText = translations[lang].homogeneousText;
-      document.getElementById('temporary-title').innerText = translations[lang].temporaryTitle;
-      document.getElementById('temporary-text').innerText = translations[lang].temporaryText;
-      document.getElementById('howto-title').innerText = translations[lang].howtoTitle;
-      document.getElementById('geco-intro').innerText = translations[lang].gecoIntro;
-      
-      // Actualizar elementos de la lista de instrucciones
-      document.getElementById('intro-names').innerText = translations[lang].introNames;
-      document.getElementById('typically-text').innerText = translations[lang].typicallyText;
-      document.getElementById('type-a').innerText = translations[lang].typeA;
-      document.getElementById('type-b').innerText = translations[lang].typeB;
-      document.getElementById('type-c').innerText = translations[lang].typeC;
-      document.getElementById('other-groups').innerText = translations[lang].otherGroups;
-      document.getElementById('members-number').innerHTML = translations[lang].membersNumber;
-      document.getElementById('team-type').innerHTML = translations[lang].teamType;
-      document.getElementById('leftover-members').innerHTML = translations[lang].leftoverMembers;
-      document.getElementById('generate-button').innerHTML = translations[lang].generateButton;
-      document.getElementById('go-to-geco').innerText = translations[lang].goToGeco;
-      
-      // Actualizar pie de página
-      document.querySelectorAll('footer p')[0].innerHTML = translations[lang].labText;
-      document.querySelectorAll('footer p')[1].innerHTML = translations[lang].authorText;
-      document.querySelectorAll('footer p')[2].innerHTML = translations[lang].licenseText;
-      
-      // Guardar preferencia de idioma
-      localStorage.setItem('preferredLanguage', lang);
+
+      document.getElementById('ideal-size').innerText = langData.idealSize;
+      document.getElementById('heterogeneous-title').innerText = langData.heterogeneousTitle;
+      document.getElementById('heterogeneous-text').innerText = langData.heterogeneousText;
+      document.getElementById('homogeneous-title').innerText = langData.homogeneousTitle;
+      document.getElementById('homogeneous-text').innerText = langData.homogeneousText;
+      document.getElementById('temporary-title').innerText = langData.temporaryTitle;
+      document.getElementById('temporary-text').innerText = langData.temporaryText;
+      document.getElementById('howto-title').innerText = langData.howtoTitle;
+      document.getElementById('geco-intro').innerText = langData.gecoIntro;
+
+      document.getElementById('intro-names').innerText = langData.introNames;
+      document.getElementById('typically-text').innerText = langData.typicallyText;
+      document.getElementById('type-a').innerText = langData.typeA;
+      document.getElementById('type-b').innerText = langData.typeB;
+      document.getElementById('type-c').innerText = langData.typeC;
+      document.getElementById('other-groups').innerText = langData.otherGroups;
+      document.getElementById('members-number').innerHTML = langData.membersNumber;
+      document.getElementById('team-type').innerHTML = langData.teamType;
+      document.getElementById('leftover-members').innerHTML = langData.leftoverMembers;
+      document.getElementById('generate-button').innerHTML = langData.generateButton;
+      document.getElementById('go-to-geco').innerText = langData.goToGeco;
+
+      const footerParas = document.querySelectorAll('footer p');
+      if (footerParas[0]) footerParas[0].innerHTML = langData.labText;
+      if (footerParas[1]) footerParas[1].innerHTML = langData.authorText;
+      if (footerParas[2]) footerParas[2].innerHTML = langData.licenseText;
     }
 
-    // Aplicar el idioma al cargar la página
-    document.addEventListener('DOMContentLoaded', function() {
-      // Comprobar si hay una preferencia de idioma guardada
+    function setLanguage(lang) {
+      if (!translations[lang]) {
+        lang = DEFAULT_LANGUAGE;
+      }
+      currentLanguage = lang;
+      localStorage.setItem('preferredLanguage', lang);
+      applyTranslations();
+      buildLanguageSwitcher();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
       const savedLang = localStorage.getItem('preferredLanguage');
-      // Si no hay preferencia guardada, detectar el idioma del navegador
-      const initialLang = savedLang || detectBrowserLanguage();
-      setLanguage(initialLang);
-      
-      // Añadir eventos para cambiar de idioma
-      document.getElementById('es-btn').addEventListener('click', function() {
-        setLanguage('es');
-      });
-      document.getElementById('ca-btn').addEventListener('click', function() {
-        setLanguage('ca');
-      });
+      const initialLang = (savedLang && translations[savedLang]) ? savedLang : detectBrowserLanguage();
+      currentLanguage = initialLang;
+      buildLanguageSwitcher();
+      applyTranslations();
     });
   </script>
 </body>
