@@ -47,7 +47,14 @@ function buildLanguageSwitcher() {
   const container = document.getElementById('languageSwitcher');
   if (!container) return;
   container.innerHTML = '';
-  Object.keys(TRANSLATIONS).forEach(lang => {
+  const preferred = ['es', 'ca', 'gl', 'eu'];
+  const order = preferred.filter(lang => TRANSLATIONS[lang]).concat(
+    Object.keys(TRANSLATIONS).filter(lang => !preferred.includes(lang) && lang !== 'en')
+  );
+  if (TRANSLATIONS.en) {
+    order.push('en');
+  }
+  order.forEach(lang => {
     const btn = document.createElement('button');
     btn.className = 'lang-btn';
     btn.textContent = TRANSLATIONS[lang].languageName || lang.toUpperCase();
@@ -469,6 +476,67 @@ function distribuirHomogeneosPorTipo(alumnos, grupos, numAlumnos, sobrantes, tip
   });
 }
 
+function agruparSobrantesHomogeneos(sobrantes, numAlumnos) {
+  if (sobrantes.length === 0) return [];
+  const copia = [...sobrantes];
+  const grupos = [];
+  while (copia.length > 0) {
+    const size = Math.min(numAlumnos, copia.length);
+    grupos.push(copia.splice(0, size));
+  }
+  for (let i = grupos.length - 1; i >= 0; i--) {
+    if (grupos[i].length === 1 && grupos.length > 1) {
+      const donante = grupos.find(g => g.length > 2);
+      if (donante) {
+        grupos[i].push(donante.pop());
+      } else if (i > 0) {
+        grupos[i - 1].push(grupos[i][0]);
+        grupos.splice(i, 1);
+      }
+    }
+  }
+  return grupos;
+}
+
+function tipoPredominante(grupo) {
+  const contador = grupo.reduce((acc, alumno) => {
+    acc[alumno.tipo] = (acc[alumno.tipo] || 0) + 1;
+    return acc;
+  }, {});
+  let mejorTipo = null;
+  let mejorConteo = -1;
+  Object.entries(contador).forEach(([tipo, conteo]) => {
+    if (conteo > mejorConteo) {
+      mejorTipo = tipo;
+      mejorConteo = conteo;
+    }
+  });
+  return mejorTipo;
+}
+
+function agregarSobrantesHomogeneos(grupos, alumnos) {
+  alumnos.forEach(alumno => {
+    const preferencias = alumno.tipo === 'A'
+      ? ['B', 'A', 'C']
+      : alumno.tipo === 'C'
+        ? ['B', 'C', 'A']
+        : ['A', 'C', 'B'];
+    let destino = null;
+    for (const pref of preferencias) {
+      destino = grupos.find(grupo => tipoPredominante(grupo) === pref);
+      if (destino) break;
+    }
+    if (!destino) {
+      destino = grupos[0];
+    }
+    if (destino) {
+      destino.push(alumno);
+    } else {
+      grupos.push([alumno]);
+    }
+  });
+}
+
 function generarGruposHeterogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, totalAlumnosOriginal) {
   let numGrupos = Math.floor(totalAlumnosOriginal / numAlumnos);
   if (numGrupos === 0 && totalAlumnosOriginal > 0) {
@@ -485,7 +553,7 @@ function generarGruposHeterogeneos(listaA, listaB, listaC, numAlumnos, incompatS
   return { grupos, sobrantes };
 }
 
-function generarGruposHomogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, totalAlumnosOriginal) {
+function generarGruposHomogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, totalAlumnosOriginal, opcionSobrantes) {
   let numGrupos = Math.floor(totalAlumnosOriginal / numAlumnos);
   if (numGrupos === 0 && totalAlumnosOriginal > 0) {
     numGrupos = 1;
@@ -496,7 +564,17 @@ function generarGruposHomogeneos(listaA, listaB, listaC, numAlumnos, incompatSet
   distribuirHomogeneosPorTipo(listaA, grupos, numAlumnos, sobrantes, 'A');
   distribuirHomogeneosPorTipo(listaB, grupos, numAlumnos, sobrantes, 'B');
   distribuirHomogeneosPorTipo(listaC, grupos, numAlumnos, sobrantes, 'C');
-  return { grupos, sobrantes };
+  const gruposSobrantes = agruparSobrantesHomogeneos(sobrantes, numAlumnos);
+  if (opcionSobrantes === 'agregar') {
+    agregarSobrantesHomogeneos(grupos, gruposSobrantes.flat());
+    return { grupos, sobrantes: [] };
+  }
+  if (gruposSobrantes.length === 1 && gruposSobrantes[0].length === 1 && grupos.length > 0) {
+    agregarSobrantesHomogeneos(grupos, gruposSobrantes[0]);
+  } else {
+    gruposSobrantes.forEach(grupo => grupos.push(grupo));
+  }
+  return { grupos, sobrantes: [] };
 }
 
 function generarGruposEsporadicos(listaRestante, numAlumnos, incompatSets, totalAlumnosOriginal) {
@@ -563,13 +641,16 @@ function generarEquipos() {
   if (tipoGrupo === 'heterogeneos') {
     resultado = generarGruposHeterogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, totalOriginal);
   } else if (tipoGrupo === 'homogeneos') {
-    resultado = generarGruposHomogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, totalOriginal);
+    resultado = generarGruposHomogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, totalOriginal, opcionSobrantes);
   } else {
     const combinados = [...listaAlumnosA, ...listaAlumnosB, ...listaAlumnosC];
     resultado = generarGruposEsporadicos(combinados, numAlumnos, incompatSets, totalOriginal);
   }
   if (!resultado) {
     return null;
+  }
+  if (tipoGrupo === 'homogeneos') {
+    return resultado.grupos;
   }
   return manejarSobrantes(resultado.grupos, opcionSobrantes, numAlumnos, resultado.sobrantes);
 }
