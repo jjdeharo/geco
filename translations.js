@@ -65,6 +65,7 @@ const TRANSLATIONS = {
       messages: {
         heteroNoAC: 'El equipo {team} no incluye alumnado A ni C.',
         sizeDifferent: 'El equipo {team} tiene {size} miembros (objetivo {target}).',
+        groupCountDifferent: 'Se han generado {current} equipos cuando se esperaban {expected}.',
         groupSingle: 'El equipo {team} se ha quedado con una sola persona y se ha combinado con otro grupo.',
         homoMixed: 'El equipo {team} mezcla tipologías: {types}.',
         incompatibles: 'Las personas incompatibles {names} han coincidido en el equipo {team}.',
@@ -138,6 +139,7 @@ const TRANSLATIONS = {
       messages: {
         heteroNoAC: "L'equip {team} no inclou alumnat A ni C.",
         sizeDifferent: "L'equip {team} té {size} membres (objectiu {target}).",
+        groupCountDifferent: "S'han generat {current} equips quan s'esperaven {expected}.",
         groupSingle: "L'equip {team} s'ha quedat amb una sola persona i s'ha integrat en un altre grup.",
         homoMixed: "L'equip {team} barreja tipologies: {types}.",
         incompatibles: "Les persones incompatibles {names} han coincidit a l'equip {team}.",
@@ -211,6 +213,7 @@ const TRANSLATIONS = {
       messages: {
         heteroNoAC: 'Team {team} does not include any A or C students.',
         sizeDifferent: 'Team {team} has {size} members (target {target}).',
+        groupCountDifferent: 'Generated {current} teams but {expected} were expected.',
         groupSingle: 'Team {team} ended up with a single member and has been merged into another group.',
         homoMixed: 'Team {team} mixes typologies: {types}.',
         incompatibles: 'Incompatible students {names} ended up together in team {team}.',
@@ -284,6 +287,7 @@ const TRANSLATIONS = {
       messages: {
         heteroNoAC: 'O equipo {team} non inclúe alumnado A nin C.',
         sizeDifferent: 'O equipo {team} ten {size} membros (obxectivo {target}).',
+        groupCountDifferent: 'Xeráronse {current} equipos cando se agardaban {expected}.',
         groupSingle: 'O equipo {team} quedou cunha soa persoa e integrouse noutro grupo.',
         homoMixed: 'O equipo {team} mestura tipoloxías: {types}.',
         incompatibles: 'As persoas incompatibles {names} coincidiron no equipo {team}.',
@@ -357,6 +361,7 @@ const TRANSLATIONS = {
       messages: {
         heteroNoAC: 'Talde {team}k ez du A edo C motako ikaslerik.',
         sizeDifferent: 'Talde {team}k {size} kide ditu (helburua {target}).',
+        groupCountDifferent: '{current} talde sortu dira baina {expected} espero ziren.',
         groupSingle: 'Talde {team} kide bakarrarekin geratu da eta beste talde batean txertatu da.',
         homoMixed: 'Talde {team} tipologia desberdinak nahasten ditu: {types}.',
         incompatibles: 'Bateraezinak diren {names} pertsonak talde {team} berean bukatu dute.',
