@@ -1304,8 +1304,21 @@
         }
 
         if (!colocado) {
-          grupos.push([alumno]);
-          indicePreferente = grupos.length;
+          if (grupos.length === 0) {
+            grupos.push([alumno]);
+            indicePreferente = 1;
+          } else {
+            let indiceMin = 0;
+            let longitudMin = grupos[0].length;
+            for (let i = 1; i < grupos.length; i++) {
+              if (grupos[i].length < longitudMin) {
+                longitudMin = grupos[i].length;
+                indiceMin = i;
+              }
+            }
+            grupos[indiceMin].push(alumno);
+            indicePreferente = indiceMin + 1;
+          }
         }
       });
 
