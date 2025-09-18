@@ -584,6 +584,18 @@
       padding: 0 6px;
     }
 
+    .brand-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .brand-logo-inline {
+      width: 40px;
+      height: 40px;
+    }
+
     .incompatibles-empty {
       font-size: 0.9rem;
       color: var(--secondary-color);
@@ -599,19 +611,11 @@
       }
     }
   
-    .brand-logo {
-      width: 68px;
-      height: 68px;
-      display: block;
-      margin: 0 auto 12px auto;
-    }
-
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="favicon.svg" alt="GeCo" class="brand-logo">
-    <h1 id="title" data-i18n="title">Generador de equipos cooperativos</h1>
+    <h1 class="brand-title"><img src="favicon.svg" alt="GeCo" class="brand-logo-inline"><span id="title" data-i18n="title">Generador de equipos cooperativos</span></h1>
 
     <div class="header-container">
       <a href="instr.html" class="nav-link" id="guide-link" data-i18n="guideLink">Guía de uso</a>
