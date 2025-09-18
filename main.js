@@ -1,6 +1,7 @@
 const DEFAULT_LANGUAGE = 'es';
 let currentLanguage = DEFAULT_LANGUAGE;
 let incompatibleGroups = [];
+let lastReportData = null;
 
 function resolveKey(obj, path) {
   return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
@@ -68,6 +69,22 @@ function buildLanguageSwitcher() {
     });
     container.appendChild(btn);
   });
+}
+
+function getCurrentTipoGrupo() {
+  return document.querySelector('input[name="tipoGrupo"]:checked')?.value || 'heterogeneos';
+}
+
+function getCurrentSobrantes() {
+  return document.querySelector('input[name="sobrantes"]:checked')?.value || 'grupoNuevo';
+}
+
+function getCurrentNumAlumnos() {
+  return parseInt(document.getElementById('numAlumnos').value, 10) || 0;
+}
+
+function cloneEquipos(equipos) {
+  return equipos ? equipos.map(grupo => grupo.map(alumno => ({ nombre: alumno.nombre, tipo: alumno.tipo }))) : null;
 }
 
 function detectBrowserLanguage() {
@@ -260,6 +277,12 @@ function setLanguage(lang) {
   buildLanguageSwitcher();
   updateInfoGrupos();
   refreshIncompatiblesUI();
+  if (lastReportData) {
+    const { equipos, tipoGrupo, numAlumnos, opcionSobrantes } = lastReportData;
+    mostrarInforme(cloneEquipos(equipos), tipoGrupo, numAlumnos, opcionSobrantes);
+  } else {
+    mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
+  }
 }
 
 function clearAllNames() {
@@ -273,6 +296,8 @@ function clearAllNames() {
     successMsg.textContent = '';
     successMsg.classList.remove('show');
   }
+  lastReportData = null;
+  mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
 }
 
 function updateInfoGrupos() {
@@ -292,7 +317,7 @@ function updateInfoGrupos() {
     countC: grupoC.length
   });
   syncIncompatibleGroupsWithStudents();
-  const leftoversOption = document.querySelector('input[name="sobrantes"]:checked')?.value || 'grupoNuevo';
+  const leftoversOption = getCurrentSobrantes();
   updateIncompatiblesInfo(totalAlumnos, numAlumnos, leftoversOption);
 }
 
@@ -667,6 +692,16 @@ function generarYMostrarEquipos() {
     return;
   }
   mostrarEquipos(equipos);
+  const tipoGrupo = getCurrentTipoGrupo();
+  const numAlumnos = getCurrentNumAlumnos();
+  const opcionSobrantes = getCurrentSobrantes();
+  lastReportData = {
+    equipos: cloneEquipos(equipos),
+    tipoGrupo,
+    numAlumnos,
+    opcionSobrantes
+  };
+  mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes);
 }
 
 function mostrarEquipos(equipos) {
@@ -723,6 +758,114 @@ function copiarEquipos(equipos) {
   });
 }
 
+function analizarEquipos(equipos, tipoGrupo, numAlumnos) {
+  const analysis = {
+    status: 'ok',
+    messages: []
+  };
+
+  const registrar = (nivel, clave, parametros = {}) => {
+    analysis.messages.push(t(`report.messages.${clave}`, parametros));
+    if (nivel === 'error') {
+      analysis.status = 'fail';
+    } else if (nivel === 'warning' && analysis.status !== 'fail') {
+      analysis.status = 'partial';
+    }
+  };
+
+  const nameToTeam = new Map();
+  equipos.forEach((grupo, index) => {
+    grupo.forEach(alumno => {
+      nameToTeam.set(alumno.nombre, index + 1);
+    });
+  });
+
+  incompatibleGroups.forEach(grupo => {
+    const contador = {};
+    grupo.forEach(nombre => {
+      const equipo = nameToTeam.get(nombre);
+      if (equipo !== undefined) {
+        contador[equipo] = (contador[equipo] || 0) + 1;
+      }
+    });
+    Object.entries(contador).forEach(([equipo, cuenta]) => {
+      if (cuenta > 1) {
+        registrar('error', 'incompatibles', { names: grupo.join(', '), team: equipo });
+      }
+    });
+  });
+
+  equipos.forEach((grupo, index) => {
+    const size = grupo.length;
+    if (size === 1) {
+      registrar('warning', 'groupSingle', { team: index + 1 });
+    }
+    if (tipoGrupo !== 'esporadicos' && numAlumnos > 0 && Math.abs(size - numAlumnos) > 1) {
+      registrar('warning', 'sizeDifferent', { team: index + 1, size, target: numAlumnos });
+    }
+    if (tipoGrupo === 'heterogeneos') {
+      const tieneClave = grupo.some(alumno => alumno.tipo === 'A' || alumno.tipo === 'C');
+      if (!tieneClave) {
+        registrar('warning', 'heteroNoAC', { team: index + 1 });
+      }
+    }
+    if (tipoGrupo === 'homogeneos') {
+      const tipos = new Set(grupo.map(alumno => alumno.tipo));
+      if (tipos.size > 1) {
+        registrar('warning', 'homoMixed', { team: index + 1, types: Array.from(tipos).join(', ') });
+      }
+    }
+    if (tipoGrupo === 'esporadicos' && numAlumnos > 0 && Math.abs(size - numAlumnos) > 1) {
+      registrar('warning', 'randomSize', { team: index + 1, size, target: numAlumnos });
+    }
+  });
+
+  return analysis;
+}
+
+function mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes) {
+  const container = document.getElementById('report');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const title = document.createElement('h3');
+  title.textContent = t('report.title');
+  container.appendChild(title);
+
+  const mode = document.createElement('p');
+  mode.textContent = t(`report.modeLabel.${tipoGrupo}`);
+  container.appendChild(mode);
+
+  if (!equipos || equipos.length === 0) {
+    const info = document.createElement('p');
+    info.textContent = t('report.noTeams');
+    container.appendChild(info);
+    return;
+  }
+
+  const analysis = analizarEquipos(equipos, tipoGrupo, numAlumnos, opcionSobrantes);
+
+  const status = document.createElement('p');
+  status.className = `report-status ${analysis.status}`;
+  status.textContent = t(`report.status.${analysis.status}`);
+  container.appendChild(status);
+
+  const summary = document.createElement('p');
+  summary.textContent = t(`report.summary.${analysis.status}`);
+  container.appendChild(summary);
+
+  if (analysis.messages.length > 0) {
+    const list = document.createElement('ul');
+    list.className = 'report-messages';
+    analysis.messages.forEach(message => {
+      const item = document.createElement('li');
+      item.textContent = message;
+      list.appendChild(item);
+    });
+    container.appendChild(list);
+  }
+}
+
 function initialise() {
   const savedLang = localStorage.getItem('preferredLanguage');
   const initialLang = savedLang || detectBrowserLanguage();
@@ -750,6 +893,7 @@ function initialise() {
   document.getElementById('clearAllBtn').addEventListener('click', clearAllNames);
   updateInfoGrupos();
   refreshIncompatiblesUI();
+  mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
 }
 
 document.addEventListener('DOMContentLoaded', initialise);

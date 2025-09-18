@@ -482,6 +482,32 @@
       margin-bottom: 15px;
     }
 
+    .report-card {
+      margin-top: 20px;
+    }
+
+    .report-status {
+      font-weight: 600;
+      margin: 8px 0;
+    }
+
+    .report-status.ok {
+      color: var(--success-color);
+    }
+
+    .report-status.partial {
+      color: var(--accent-color);
+    }
+
+    .report-status.fail {
+      color: #e74c3c;
+    }
+
+    .report-messages {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+
     .incompatibles-card {
       margin-top: 15px;
     }
@@ -694,6 +720,8 @@
     <button id="generarGrupos" class="btn" data-i18n="generateButton">Generar equipos</button>
 
     <div id="resultados" class="card"></div>
+
+    <div id="report" class="card report-card"></div>
     
     <div id="copySuccess" class="success-message"></div>
 
