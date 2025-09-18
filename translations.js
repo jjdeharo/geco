@@ -40,10 +40,12 @@ const TRANSLATIONS = {
       noTeamsForIncompatibles: 'No se pueden marcar personas incompatibles hasta que haya equipos disponibles.',
       homogeneousMixed: 'Los grupos incompatibles deben ser del mismo tipo en modo homogéneo.'
     },
-    gecoDoi: "GeCo - <a href='https://doi.org/10.5281/zenodo.7934796' target='_blank'>DOI: 10.5281/zenodo.7934796</a>",
-    labText: "Laboratorio de aplicaciones educativas <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-    authorText: "Aplicación hecha por <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
-    licenseText: "Esta obra está bajo una licencia <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>",
+    footer: {
+      heading: 'Generador de equipos cooperativos',
+      meta: "© 2025 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
+      code: "El código de esta aplicación está disponible bajo licencia <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a>.",
+      content: "Los contenidos educativos (textos, ejercicios, vídeos e imágenes) están bajo licencia <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>."
+    },
     report: {
       title: 'Informe de equipos',
       noTeams: 'Genera equipos para ver el informe.',
@@ -114,10 +116,12 @@ const TRANSLATIONS = {
       noTeamsForIncompatibles: 'No es poden marcar persones incompatibles fins que hi hagi equips disponibles.',
       homogeneousMixed: 'Els grups incompatibles han de ser del mateix tipus en mode homogeni.'
     },
-    gecoDoi: "GeCo - <a href='https://doi.org/10.5281/zenodo.7934796' target='_blank'>DOI: 10.5281/zenodo.7934796</a>",
-    labText: "Laboratori d'aplicacions educatives <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-    authorText: "Aplicació feta per <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
-    licenseText: "Aquesta obra està sota una llicència <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>",
+    footer: {
+      heading: "Generador d'equips cooperatius",
+      meta: "© 2025 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
+      code: "El codi d'aquesta aplicació està disponible amb llicència <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a>.",
+      content: "Els continguts educatius (textos, exercicis, vídeos i imatges) estan sota llicència <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>."
+    },
     report: {
       title: "Informe d'equips",
       noTeams: "Genera els equips per veure l'informe.",
@@ -188,10 +192,12 @@ const TRANSLATIONS = {
       noTeamsForIncompatibles: 'You cannot mark incompatible people until there are teams available.',
       homogeneousMixed: 'Incompatible groups must contain students of the same type when using homogeneous teams.'
     },
-    gecoDoi: "GeCo - <a href='https://doi.org/10.5281/zenodo.7934796' target='_blank'>DOI: 10.5281/zenodo.7934796</a>",
-    labText: "Educational Applications Lab <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-    authorText: "Application by <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
-    licenseText: "This work is licensed under <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>",
+    footer: {
+      heading: 'Cooperative Team Generator',
+      meta: "© 2025 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
+      code: "The source code is released under the <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a> license.",
+      content: "Educational content (text, exercises, videos and images) is licensed under <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>."
+    },
     report: {
       title: 'Team report',
       noTeams: 'Generate teams to view the report.',
@@ -262,10 +268,12 @@ const TRANSLATIONS = {
       noTeamsForIncompatibles: 'Non se poden marcar incompatibles ata que haxa equipos dispoñibles.',
       homogeneousMixed: 'Os grupos incompatibles deben ser do mesmo tipo cando os equipos son homoxéneos.'
     },
-    gecoDoi: "GeCo - <a href='https://doi.org/10.5281/zenodo.7934796' target='_blank'>DOI: 10.5281/zenodo.7934796</a>",
-    labText: "Laboratorio de aplicacións educativas <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-    authorText: "Aplicación creada por <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
-    licenseText: "Esta obra está baixo unha licenza <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>",
+    footer: {
+      heading: 'Xerador de equipos cooperativos',
+      meta: "© 2025 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
+      code: "O código desta aplicación publícase baixo licenza <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a>.",
+      content: "Os contidos educativos (textos, exercicios, vídeos e imaxes) están baixo licenza <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>."
+    },
     report: {
       title: 'Informe de equipos',
       noTeams: 'Xera os equipos para ver o informe.',
@@ -336,10 +344,12 @@ const TRANSLATIONS = {
       noTeamsForIncompatibles: 'Bateraezinak markatzeko, lehenik taldeak egon behar dira eskuragarri.',
       homogeneousMixed: 'Bateraezinen taldeek tipologia bereko kideak izan behar dituzte talde homogeneoak sortzean.'
     },
-    gecoDoi: "GeCo - <a href='https://doi.org/10.5281/zenodo.7934796' target='_blank'>DOI: 10.5281/zenodo.7934796</a>",
-    labText: "Hezkuntza-aplikazioen laborategia <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-    authorText: "Aplikazioa <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>-k egina", 
-    licenseText: "Lan hau <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a> lizentziapean dago",
+    footer: {
+      heading: 'Talde kooperatiboen sortzailea',
+      meta: "© 2025 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
+      code: "Aplikazio honen kodea <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a> lizentziapean argitaratua dago.",
+      content: "Eduki didaktikoak (testuak, ariketak, bideoak eta irudiak) <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a> lizentziapean daude."
+    },
     report: {
       title: 'Talde txostena',
       noTeams: 'Txostena ikusteko sortu taldeak.',
