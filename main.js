@@ -3,6 +3,77 @@ let currentLanguage = DEFAULT_LANGUAGE;
 let incompatibleGroups = [];
 let lastReportData = null;
 
+const SAMPLE_NAMES = {
+  es: {
+    A: ['Ana', 'Pedro', 'María', 'Luis'],
+    B: ['Lucía', 'Carlos', 'Marta', 'Juan', 'Sofía', 'Miguel', 'Elena', 'Pablo', 'Laura', 'Alejandro', 'Carmen', 'David', 'Raquel', 'Andrea', 'Jorge'],
+    C: ['Isabel', 'Guillermo', 'Martín', 'Irene', 'Daniel', 'Teresa', 'Javier']
+  },
+  ca: {
+    A: ['Anna', 'Pau', 'Maria', 'Lluís'],
+    B: ['Laia', 'Oriol', 'Núria', 'Jordi', 'Clara', 'Marc', 'Gemma', 'Arnau', 'Mireia', 'Roger', 'Meritxell', 'Xavi', 'Helena', 'Carles', 'Irene'],
+    C: ['Montserrat', 'Ferran', 'Eulàlia', 'Biel', 'Neus', 'Quim', 'Sílvia']
+  },
+  gl: {
+    A: ['Uxía', 'Xoán', 'Brais', 'Sabela'],
+    B: ['Noa', 'Manuel', 'Iria', 'Diego', 'Antía', 'Hugo', 'Celia', 'Mateo', 'Lara', 'Iago', 'Uxío', 'Carmen', 'Breogán', 'Alda', 'Xiana'],
+    C: ['Rosalía', 'Lois', 'Mencía', 'Teo', 'Lúa', 'Anxo', 'Carme']
+  },
+  eu: {
+    A: ['Ane', 'Iker', 'Maialen', 'Jon'],
+    B: ['Uxue', 'Aitor', 'Nahia', 'Unai', 'June', 'Asier', 'Irati', 'Ibai', 'Mikel', 'Odei', 'Leire', 'Gorka', 'Ainhoa', 'Ekaitz', 'Nerea'],
+    C: ['Kattalin', 'Endika', 'Itziar', 'Luken', 'Amaia', 'Gaizka', 'Naia']
+  },
+  en: {
+    A: ['Alice', 'Peter', 'Mary', 'Lewis'],
+    B: ['Olivia', 'Liam', 'Emma', 'Noah', 'Sophia', 'James', 'Amelia', 'Benjamin', 'Charlotte', 'Ethan', 'Harper', 'Daniel', 'Grace', 'Lucas', 'Chloe'],
+    C: ['George', 'Martha', 'Samuel', 'Eleanor', 'Harold', 'Ivy', 'Caleb']
+  }
+};
+
+const SAMPLE_NAME_GROUPS = {
+  grupoA: 'A',
+  grupoB: 'B',
+  grupoC: 'C'
+};
+
+function getSampleList(lang, groupKey) {
+  return SAMPLE_NAMES[lang]?.[groupKey] || null;
+}
+
+function formatSampleNames(lang, groupKey) {
+  const list = getSampleList(lang, groupKey);
+  return list ? list.join(', ') : '';
+}
+
+function getSampleSignature(lang, groupKey) {
+  const list = getSampleList(lang, groupKey);
+  return list ? list.join('|') : null;
+}
+
+function normaliseNamesValue(value) {
+  if (!value) {
+    return '';
+  }
+  return parseNames(value).join('|');
+}
+
+function isSampleValueForLang(value, lang, groupKey) {
+  const signature = getSampleSignature(lang, groupKey);
+  if (!signature) {
+    return false;
+  }
+  return normaliseNamesValue(value) === signature;
+}
+
+function findSampleLanguageForValue(value, groupKey) {
+  const signature = normaliseNamesValue(value);
+  if (!signature) {
+    return null;
+  }
+  return Object.keys(SAMPLE_NAMES).find(lang => getSampleSignature(lang, groupKey) === signature) || null;
+}
+
 function resolveKey(obj, path) {
   return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
 }
@@ -266,7 +337,62 @@ function clearIncompatibleGroups() {
   refreshIncompatiblesUI();
 }
 
+function setupSampleNamesMetadata() {
+  Object.entries(SAMPLE_NAME_GROUPS).forEach(([elementId, groupKey]) => {
+    const textarea = document.getElementById(elementId);
+    if (!textarea) return;
+    const matchedLang = findSampleLanguageForValue(textarea.value, groupKey);
+    if (matchedLang) {
+      textarea.dataset.sampleLang = matchedLang;
+    } else {
+      delete textarea.dataset.sampleLang;
+    }
+  });
+}
+
+function applySampleNamesForLanguage(targetLang, previousLang) {
+  const sampleData = SAMPLE_NAMES[targetLang];
+  if (!sampleData) {
+    return;
+  }
+  Object.entries(SAMPLE_NAME_GROUPS).forEach(([elementId, groupKey]) => {
+    const textarea = document.getElementById(elementId);
+    if (!textarea) return;
+    const sampleValue = formatSampleNames(targetLang, groupKey);
+    if (!sampleValue) return;
+    const currentValue = textarea.value.trim();
+    const datasetLang = textarea.dataset.sampleLang;
+    const matchesPrevSample = previousLang ? isSampleValueForLang(currentValue, previousLang, groupKey) : false;
+    const shouldApply = !currentValue || datasetLang || matchesPrevSample;
+    if (!shouldApply) {
+      return;
+    }
+    textarea.value = sampleValue;
+    textarea.dataset.sampleLang = targetLang;
+  });
+}
+
+function handleNamesInput(event) {
+  const textarea = event.target;
+  const groupKey = SAMPLE_NAME_GROUPS[textarea.id];
+  if (!groupKey) {
+    return;
+  }
+  const datasetLang = textarea.dataset.sampleLang;
+  if (datasetLang && !isSampleValueForLang(textarea.value, datasetLang, groupKey)) {
+    delete textarea.dataset.sampleLang;
+  } else if (!datasetLang) {
+    const detected = findSampleLanguageForValue(textarea.value, groupKey);
+    if (detected) {
+      textarea.dataset.sampleLang = detected;
+    }
+  }
+  updateInfoGrupos();
+  refreshIncompatiblesUI();
+}
+
 function setLanguage(lang) {
+  const previousLanguage = currentLanguage;
   if (!TRANSLATIONS[lang]) {
     lang = DEFAULT_LANGUAGE;
   }
@@ -275,6 +401,7 @@ function setLanguage(lang) {
   localStorage.setItem('preferredLanguage', lang);
   applyTranslations();
   buildLanguageSwitcher();
+  applySampleNamesForLanguage(currentLanguage, previousLanguage);
   updateInfoGrupos();
   refreshIncompatiblesUI();
   if (lastReportData) {
@@ -286,9 +413,12 @@ function setLanguage(lang) {
 }
 
 function clearAllNames() {
-  document.getElementById('grupoA').value = '';
-  document.getElementById('grupoB').value = '';
-  document.getElementById('grupoC').value = '';
+  ['grupoA', 'grupoB', 'grupoC'].forEach(id => {
+    const textarea = document.getElementById(id);
+    if (!textarea) return;
+    textarea.value = '';
+    delete textarea.dataset.sampleLang;
+  });
   clearIncompatibleGroups();
   updateInfoGrupos();
   const successMsg = document.getElementById('copySuccess');
@@ -883,23 +1013,15 @@ function mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes) {
 }
 
 function initialise() {
+  setupSampleNamesMetadata();
   const savedLang = localStorage.getItem('preferredLanguage');
   const initialLang = savedLang || detectBrowserLanguage();
   setLanguage(initialLang);
   initNumberSelector();
   initTypologyColumns();
-  document.getElementById('grupoA').addEventListener('input', () => {
-    updateInfoGrupos();
-    refreshIncompatiblesUI();
-  });
-  document.getElementById('grupoB').addEventListener('input', () => {
-    updateInfoGrupos();
-    refreshIncompatiblesUI();
-  });
-  document.getElementById('grupoC').addEventListener('input', () => {
-    updateInfoGrupos();
-    refreshIncompatiblesUI();
-  });
+  document.getElementById('grupoA').addEventListener('input', handleNamesInput);
+  document.getElementById('grupoB').addEventListener('input', handleNamesInput);
+  document.getElementById('grupoC').addEventListener('input', handleNamesInput);
   document.getElementById('addIncompatibleBtn').addEventListener('click', addIncompatibleGroup);
   document.getElementById('clearIncompatiblesBtn').addEventListener('click', clearIncompatibleGroups);
   document.querySelectorAll('input[name="sobrantes"]').forEach(radio => {
