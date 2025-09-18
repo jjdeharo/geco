@@ -1,6 +1,6 @@
 # GeCo (Generador de Equipos Cooperativos)
 
-GeCo es una aplicación web pensada para docentes de ESO y Bachillerato que necesitan crear equipos cooperativos de forma rápida y controlada. Permite importar la lista de alumnado clasificada por tipologías (A, B, C) y generar distintos tipos de agrupaciones respetando las incompatibilidades configuradas.
+GeCo es una aplicación web pensada para docentes de ESO y Bachillerato que necesitan crear equipos cooperativos de forma rápida y controlada. Permite introducir o pegar la lista de alumnado clasificada por tipologías (A, B, C) y generar distintos tipos de agrupaciones respetando las incompatibilidades configuradas.
 
 ## Características
 - **Tres modos de agrupación**: heterogéneos (equipos base), homogéneos (similares) y esporádicos (aleatorios).
