@@ -481,6 +481,96 @@
       align-items: center;
       margin-bottom: 15px;
     }
+
+    .incompatibles-card {
+      margin-top: 15px;
+    }
+
+    .incompatibles-description {
+      margin-bottom: 12px;
+      color: var(--secondary-color);
+    }
+
+    .incompatibles-controls {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+      margin-bottom: 12px;
+    }
+
+    .incompatibles-controls select {
+      flex: 1;
+      min-height: 140px;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-family: inherit;
+    }
+
+    .incompatibles-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-inline {
+      min-width: 180px;
+    }
+
+    .incompatibles-info {
+      font-size: 0.9rem;
+      color: var(--secondary-color);
+      margin-bottom: 12px;
+    }
+
+    .incompatibles-info.warning {
+      color: #c0392b;
+      font-weight: 600;
+    }
+
+    .incompatibles-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .incompatibles-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      background-color: #fdfdfd;
+    }
+
+    .incompatibles-group span {
+      font-size: 0.95rem;
+    }
+
+    .incompatibles-remove {
+      background: none;
+      border: none;
+      color: var(--accent-color);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 6px;
+    }
+
+    .incompatibles-empty {
+      font-size: 0.9rem;
+      color: var(--secondary-color);
+    }
+
+    @media (max-width: 768px) {
+      .incompatibles-controls {
+        flex-direction: column;
+      }
+
+      .btn-inline {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -549,6 +639,26 @@
       </div>
       <div class="info-column">
         <p id="infoTotales" class="info-text-secondary"></p>
+      </div>
+    </div>
+
+    <div class="card incompatibles-card" id="incompatiblesCard">
+      <div class="card-header">
+        <h2 id="incompatiblesTitle">Personas incompatibles</h2>
+        <button id="clearIncompatiblesBtn" class="clear-all-btn" type="button">Vaciar incompatibles</button>
+      </div>
+      <p id="incompatiblesDescription" class="incompatibles-description">
+        Selecciona varias personas (Ctrl o Shift + clic) y crea grupos que no deban coincidir en un mismo equipo.
+      </p>
+      <div class="incompatibles-controls">
+        <select id="incompatiblesSelect" multiple></select>
+        <div class="incompatibles-buttons">
+          <button id="addIncompatibleBtn" class="btn btn-inline" type="button">Crear grupo incompatible</button>
+        </div>
+      </div>
+      <p id="incompatibles-limit" class="incompatibles-info">Incompatibles: 0 de 0 permitidos.</p>
+      <div id="incompatiblesList" class="incompatibles-list">
+        <p class="incompatibles-empty" id="incompatiblesEmpty">No hay grupos incompatibles definidos.</p>
       </div>
     </div>
 
@@ -622,6 +732,15 @@
         generateButton: "Generar equipos",
         copyButton: "Copiar equipos",
         copySuccess: "Equipos copiados al portapapeles",
+        incompatiblesTitle: "Personas incompatibles",
+        incompatiblesDescription: "Selecciona varias personas (Ctrl o Shift + clic) y crea grupos que no deban coincidir en un mismo equipo.",
+        incompatiblesAdd: "Crear grupo incompatible",
+        incompatiblesClear: "Vaciar incompatibles",
+        incompatiblesEmpty: "No hay grupos incompatibles definidos.",
+        incompatiblesLimit: "Grupos incompatibles: {count}. Máximo {max} miembros por grupo.",
+        incompatiblesWarning: "Cada grupo incompatible no puede tener más miembros que el número de equipos disponibles.",
+        incompatiblesSelectHint: "Selecciona al menos dos personas para crear un grupo incompatible.",
+        incompatiblesDuplicate: "Alguna persona ya está en otro grupo incompatible.",
         gecoDoi: "GeCo - <a href='https://doi.org/10.5281/zenodo.7934796' target='_blank'>DOI: 10.5281/zenodo.7934796</a>",
         labText: "Laboratorio de aplicaciones educativas <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
         authorText: "Aplicación hecha por <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
@@ -646,6 +765,15 @@
         generateButton: "Generar equips",
         copyButton: "Copiar equips",
         copySuccess: "Equips copiats al portapapers",
+        incompatiblesTitle: "Persones incompatibles",
+        incompatiblesDescription: "Selecciona diverses persones (Ctrl o Shift + clic) i crea grups que no han de coincidir al mateix equip.",
+        incompatiblesAdd: "Crear grup incompatible",
+        incompatiblesClear: "Buidar incompatibles",
+        incompatiblesEmpty: "No hi ha grups incompatibles definits.",
+        incompatiblesLimit: "Grups incompatibles: {count}. Màxim {max} membres per grup.",
+        incompatiblesWarning: "Cada grup incompatible no pot tenir més membres que el nombre d'equips disponibles.",
+        incompatiblesSelectHint: "Selecciona almenys dues persones per crear un grup incompatible.",
+        incompatiblesDuplicate: "Alguna persona ja forma part d'un altre grup incompatible.",
         gecoDoi: "GeCo - <a href='https://doi.org/10.5281/zenodo.7934796' target='_blank'>DOI: 10.5281/zenodo.7934796</a>",
         labText: "Laboratori d'aplicacions educatives <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
         authorText: "Aplicació feta per <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
@@ -653,10 +781,228 @@
       }
     };
 
+    let incompatibleGroups = [];
+
     // Función para detectar el idioma del navegador
     function detectBrowserLanguage() {
       const userLang = navigator.language || navigator.userLanguage;
       return userLang.startsWith('ca') ? 'ca' : 'es';
+    }
+
+    function parseNames(value) {
+      return value
+        .split(/[\n,]+/)
+        .map(item => item.trim())
+        .filter(item => item.length > 0);
+    }
+
+    function getStudentLists() {
+      const grupoA = parseNames(document.getElementById('grupoA').value);
+      const grupoB = parseNames(document.getElementById('grupoB').value);
+      const grupoC = parseNames(document.getElementById('grupoC').value);
+      return { grupoA, grupoB, grupoC };
+    }
+
+    function getAllStudentsArray() {
+      const { grupoA, grupoB, grupoC } = getStudentLists();
+      return [...grupoA, ...grupoB, ...grupoC];
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function etiquetarAlumnos(lista, tipo) {
+      return lista.map(nombre => ({ nombre, tipo }));
+    }
+
+    function calculateMaxGroups(totalStudents, membersPerGroup, leftoversOption) {
+      if (!membersPerGroup || membersPerGroup <= 0 || totalStudents <= 0) {
+        return 0;
+      }
+
+      const baseGroups = Math.floor(totalStudents / membersPerGroup);
+      const remainder = totalStudents % membersPerGroup;
+
+      if (baseGroups === 0 && remainder > 0) {
+        return 1;
+      }
+
+      if (remainder > 0 && leftoversOption === 'grupoNuevo') {
+        return baseGroups + 1;
+      }
+
+      return baseGroups > 0 ? baseGroups : (remainder > 0 ? 1 : 0);
+    }
+
+    function getIncompatibleNamesSet() {
+      return new Set(incompatibleGroups.flat());
+    }
+
+    function syncIncompatibleGroupsWithStudents() {
+      const available = new Set(getAllStudentsArray());
+      let changed = false;
+
+      incompatibleGroups = incompatibleGroups
+        .map(group => group.filter(name => available.has(name)))
+        .filter(group => {
+          if (group.length < 2) {
+            changed = true;
+            return false;
+          }
+          return true;
+        });
+
+      return changed;
+    }
+
+    function formatIncompatiblesLimit(lang, groupCount, max) {
+      return translations[lang].incompatiblesLimit
+        .replace('{count}', groupCount)
+        .replace('{max}', max);
+    }
+
+    function updateIncompatiblesSelect(lang) {
+      const select = document.getElementById('incompatiblesSelect');
+      if (!select) return;
+
+      const usedNames = getIncompatibleNamesSet();
+      const uniqueStudents = Array.from(new Set(getAllStudentsArray()))
+        .filter(name => !usedNames.has(name))
+        .sort((a, b) => a.localeCompare(b, lang === 'ca' ? 'ca' : 'es', { sensitivity: 'base' }));
+
+      select.innerHTML = '';
+
+      uniqueStudents.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+
+      select.disabled = uniqueStudents.length === 0;
+    }
+
+    function renderIncompatiblesList(lang) {
+      const container = document.getElementById('incompatiblesList');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (incompatibleGroups.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'incompatibles-empty';
+        empty.textContent = translations[lang].incompatiblesEmpty;
+        container.appendChild(empty);
+        return;
+      }
+
+      incompatibleGroups.forEach((group, index) => {
+        const item = document.createElement('div');
+        item.className = 'incompatibles-group';
+
+        const label = document.createElement('span');
+        const prefix = lang === 'ca' ? 'Grup' : 'Grupo';
+        label.textContent = `${prefix} ${index + 1}: ${group.join(', ')}`;
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'incompatibles-remove';
+        button.setAttribute('aria-label', lang === 'ca' ? 'Eliminar grup incompatible' : 'Eliminar grupo incompatible');
+        button.textContent = '×';
+        button.addEventListener('click', () => removeIncompatibleGroup(index));
+
+        item.appendChild(label);
+        item.appendChild(button);
+        container.appendChild(item);
+      });
+    }
+
+    function updateIncompatiblesInfo(totalStudents, membersPerGroup, leftoversOption, lang) {
+      const label = document.getElementById('incompatibles-limit');
+      if (!label) return;
+
+      const maxGroups = calculateMaxGroups(totalStudents, membersPerGroup, leftoversOption);
+      const groupCount = incompatibleGroups.length;
+
+      label.textContent = formatIncompatiblesLimit(lang, groupCount, maxGroups);
+
+      const hasOversizeGroup = incompatibleGroups.some(group => maxGroups > 0 && group.length > maxGroups);
+      label.classList.toggle('warning', hasOversizeGroup);
+
+      return maxGroups;
+    }
+
+    function refreshIncompatiblesUI() {
+      const lang = document.getElementById('ca-btn').classList.contains('active') ? 'ca' : 'es';
+      const { grupoA, grupoB, grupoC } = getStudentLists();
+      const membersPerGroup = parseInt(document.getElementById('numAlumnos').value, 10) || 0;
+      const leftoversOption = document.querySelector('input[name="sobrantes"]:checked')?.value || 'grupoNuevo';
+      const totalStudents = grupoA.length + grupoB.length + grupoC.length;
+
+      syncIncompatibleGroupsWithStudents();
+      updateIncompatiblesSelect(lang);
+      updateIncompatiblesInfo(totalStudents, membersPerGroup, leftoversOption, lang);
+      renderIncompatiblesList(lang);
+    }
+
+    function addIncompatibleGroup() {
+      const select = document.getElementById('incompatiblesSelect');
+      if (!select || select.disabled) return;
+
+      const selected = Array.from(select.selectedOptions).map(opt => opt.value.trim()).filter(Boolean);
+      const lang = document.getElementById('ca-btn').classList.contains('active') ? 'ca' : 'es';
+
+      if (selected.length < 2) {
+        alert(translations[lang].incompatiblesSelectHint);
+        return;
+      }
+
+      const membersPerGroup = parseInt(document.getElementById('numAlumnos').value, 10) || 0;
+      const { grupoA, grupoB, grupoC } = getStudentLists();
+      const totalStudents = grupoA.length + grupoB.length + grupoC.length;
+      const leftoversOption = document.querySelector('input[name="sobrantes"]:checked')?.value || 'grupoNuevo';
+      const maxGroups = calculateMaxGroups(totalStudents, membersPerGroup, leftoversOption);
+
+      if (maxGroups === 0) {
+        alert(translations[lang].incompatiblesWarning);
+        return;
+      }
+
+      if (selected.length > maxGroups) {
+        alert(translations[lang].incompatiblesWarning);
+        return;
+      }
+
+      const usedNames = getIncompatibleNamesSet();
+      const hasDuplicates = selected.some(name => usedNames.has(name));
+
+      if (hasDuplicates) {
+        alert(translations[lang].incompatiblesDuplicate);
+        return;
+      }
+
+      incompatibleGroups.push(selected);
+
+      Array.from(select.options).forEach(option => {
+        option.selected = false;
+      });
+
+      refreshIncompatiblesUI();
+    }
+
+    function removeIncompatibleGroup(index) {
+      incompatibleGroups.splice(index, 1);
+      refreshIncompatiblesUI();
+    }
+
+    function clearIncompatibleGroups() {
+      incompatibleGroups = [];
+      refreshIncompatiblesUI();
     }
 
     // Función para establecer el idioma
@@ -682,6 +1028,10 @@
       document.getElementById('label-new-team').innerText = translations[lang].newTeamLabel;
       document.getElementById('label-add-to-others').innerText = translations[lang].addToOthersLabel;
       document.getElementById('generarGrupos').innerText = translations[lang].generateButton;
+      document.getElementById('incompatiblesTitle').innerText = translations[lang].incompatiblesTitle;
+      document.getElementById('clearIncompatiblesBtn').innerText = translations[lang].incompatiblesClear;
+      document.getElementById('incompatiblesDescription').innerText = translations[lang].incompatiblesDescription;
+      document.getElementById('addIncompatibleBtn').innerText = translations[lang].incompatiblesAdd;
       document.getElementById('geco-doi').innerHTML = translations[lang].gecoDoi;
       document.querySelectorAll('footer p')[1].innerHTML = translations[lang].labText;
       document.querySelectorAll('footer p')[2].innerHTML = translations[lang].authorText;
@@ -689,6 +1039,8 @@
       
       // Actualizar la información de grupos
       updateInfoGrupos();
+
+      refreshIncompatiblesUI();
       
       // Guardar preferencia de idioma
       localStorage.setItem('preferredLanguage', lang);
@@ -699,7 +1051,9 @@
       document.getElementById('grupoA').value = '';
       document.getElementById('grupoB').value = '';
       document.getElementById('grupoC').value = '';
+      incompatibleGroups = [];
       updateInfoGrupos();
+      refreshIncompatiblesUI();
     }
 
     // Aplicar el idioma al cargar la página
@@ -729,6 +1083,13 @@
       document.getElementById('grupoB').addEventListener('input', updateInfoGrupos);
       document.getElementById('grupoC').addEventListener('input', updateInfoGrupos);
       
+      document.getElementById('addIncompatibleBtn').addEventListener('click', addIncompatibleGroup);
+      document.getElementById('clearIncompatiblesBtn').addEventListener('click', clearIncompatibleGroups);
+
+      document.querySelectorAll('input[name="sobrantes"]').forEach(radio => {
+        radio.addEventListener('change', refreshIncompatiblesUI);
+      });
+
       // Añadir evento al botón de generar equipos
       document.getElementById('generarGrupos').addEventListener('click', function() {
         generarYMostrarEquipos();
@@ -736,6 +1097,8 @@
       
       // Añadir evento al botón de borrar todos los nombres
       document.getElementById('clearAllBtn').addEventListener('click', clearAllNames);
+
+      refreshIncompatiblesUI();
     });
     
     // Función para inicializar el selector numérico
@@ -770,30 +1133,25 @@
     
     // Función para actualizar la información de grupos
     function updateInfoGrupos() {
-      const grupoA = document.getElementById('grupoA').value.split(',').map(item => item.trim()).filter(item => item !== '');
-      const grupoB = document.getElementById('grupoB').value.split(',').map(item => item.trim()).filter(item => item !== '');
-      const grupoC = document.getElementById('grupoC').value.split(',').map(item => item.trim()).filter(item => item !== '');
-      const numAlumnos = parseInt(document.getElementById('numAlumnos').value);
-      
+      const { grupoA, grupoB, grupoC } = getStudentLists();
+      const numAlumnos = parseInt(document.getElementById('numAlumnos').value, 10) || 0;
       const totalAlumnos = grupoA.length + grupoB.length + grupoC.length;
-      const numEquipos = Math.floor(totalAlumnos / numAlumnos);
-      const sobrantes = totalAlumnos % numAlumnos;
-      
-      const lang = document.getElementById('es-btn').classList.contains('active') ? 'es' : 'ca';
-      
-      let infoText = '';
-      let infoTotalesText = '';
-      
+      const numEquipos = numAlumnos > 0 ? Math.floor(totalAlumnos / numAlumnos) : 0;
+      const sobrantes = numAlumnos > 0 ? totalAlumnos % numAlumnos : totalAlumnos;
+      const lang = document.getElementById('ca-btn').classList.contains('active') ? 'ca' : 'es';
+
+      const infoGrupos = document.getElementById('infoGrupos');
+      const infoTotales = document.getElementById('infoTotales');
+
       if (lang === 'es') {
-        infoText = `Equipos: ${numEquipos} | Sobran: ${sobrantes}`;
-        infoTotalesText = `Total: ${totalAlumnos} personas (A: ${grupoA.length}, B: ${grupoB.length}, C: ${grupoC.length})`;
+        infoGrupos.textContent = `Equipos: ${numEquipos} | Sobran: ${sobrantes}`;
+        infoTotales.textContent = `Total: ${totalAlumnos} personas (A: ${grupoA.length}, B: ${grupoB.length}, C: ${grupoC.length})`;
       } else {
-        infoText = `Equips: ${numEquipos} | Sobren: ${sobrantes}`;
-        infoTotalesText = `Total: ${totalAlumnos} persones (A: ${grupoA.length}, B: ${grupoB.length}, C: ${grupoC.length})`;
+        infoGrupos.textContent = `Equips: ${numEquipos} | Sobren: ${sobrantes}`;
+        infoTotales.textContent = `Total: ${totalAlumnos} persones (A: ${grupoA.length}, B: ${grupoB.length}, C: ${grupoC.length})`;
       }
-      
-      document.getElementById('infoGrupos').textContent = infoText;
-      document.getElementById('infoTotales').textContent = infoTotalesText;
+
+      refreshIncompatiblesUI();
     }
     
     // Función para inicializar los eventos de las columnas de tipología
@@ -825,143 +1183,318 @@
     }
 
     // Función para generar equipos
+    function preAsignarIncompatibles(grupos, incompatSets, numAlumnos) {
+      if (grupos.length === 0 && incompatSets.length > 0) {
+        grupos.push([]);
+      }
+
+      incompatSets.forEach(set => {
+        const nombresSet = new Set(set.map(alumno => alumno.nombre));
+        set.forEach(alumno => {
+          let asignado = false;
+          for (let i = 0; i < grupos.length; i++) {
+            const grupo = grupos[i];
+            if (grupo.length >= numAlumnos) {
+              continue;
+            }
+            const conflicto = grupo.some(miembro => nombresSet.has(miembro.nombre));
+            if (!conflicto) {
+              grupo.push(alumno);
+              asignado = true;
+              break;
+            }
+          }
+
+          if (!asignado) {
+            grupos.push([alumno]);
+          }
+        });
+      });
+    }
+
+    function distribuirAlumnosPorGrupo(alumnos, grupos, numAlumnos, sobrantes) {
+      if (grupos.length === 0) {
+        sobrantes.push(...alumnos);
+        return;
+      }
+
+      let indicePreferente = 0;
+
+      alumnos.forEach(alumno => {
+        let colocado = false;
+        for (let i = 0; i < grupos.length; i++) {
+          const indice = (indicePreferente + i) % grupos.length;
+          if (grupos[indice].length < numAlumnos) {
+            grupos[indice].push(alumno);
+            indicePreferente = indice + 1;
+            colocado = true;
+            break;
+          }
+        }
+
+        if (!colocado) {
+          sobrantes.push(alumno);
+        }
+      });
+    }
+
+    function balancearGruposHeterogeneos(grupos, incompatiblesSet) {
+      grupos.forEach((grupo, indiceGrupo) => {
+        const tieneA = grupo.some(alumno => alumno.tipo === 'A');
+        const tieneC = grupo.some(alumno => alumno.tipo === 'C');
+
+        if (tieneA || tieneC) {
+          return;
+        }
+
+        const indiceBDisponible = grupo.findIndex(alumno => alumno.tipo === 'B' && !incompatiblesSet.has(alumno.nombre));
+        if (indiceBDisponible === -1) {
+          return;
+        }
+
+        for (let j = 0; j < grupos.length; j++) {
+          if (j === indiceGrupo) continue;
+          const grupoDonante = grupos[j];
+
+          const indiceA = grupoDonante.findIndex(alumno => alumno.tipo === 'A' && !incompatiblesSet.has(alumno.nombre));
+          if (indiceA !== -1) {
+            const intercambio = grupoDonante[indiceA];
+            grupoDonante[indiceA] = grupo[indiceBDisponible];
+            grupo[indiceBDisponible] = intercambio;
+            return;
+          }
+
+          const indiceC = grupoDonante.findIndex(alumno => alumno.tipo === 'C' && !incompatiblesSet.has(alumno.nombre));
+          if (indiceC !== -1) {
+            const intercambio = grupoDonante[indiceC];
+            grupoDonante[indiceC] = grupo[indiceBDisponible];
+            grupo[indiceBDisponible] = intercambio;
+            return;
+          }
+        }
+      });
+    }
+
+    function manejarSobrantes(grupos, opcion, numAlumnos, sobrantes) {
+      if (!sobrantes || sobrantes.length === 0) {
+        return grupos;
+      }
+
+      if (opcion === 'grupoNuevo') {
+        grupos.push([...sobrantes]);
+        return grupos;
+      }
+
+      if (grupos.length === 0) {
+        grupos.push([]);
+      }
+
+      let indicePreferente = 0;
+
+      sobrantes.forEach(alumno => {
+        let colocado = false;
+        for (let i = 0; i < grupos.length; i++) {
+          const indice = (indicePreferente + i) % grupos.length;
+          if (grupos[indice].length < numAlumnos) {
+            grupos[indice].push(alumno);
+            indicePreferente = indice + 1;
+            colocado = true;
+            break;
+          }
+        }
+
+        if (!colocado) {
+          grupos.push([alumno]);
+          indicePreferente = grupos.length;
+        }
+      });
+
+      return grupos;
+    }
+
+    function distribuirHomogeneosPorTipo(alumnos, grupos, numAlumnos, sobrantes, tipo) {
+      alumnos.forEach(alumno => {
+        let colocado = false;
+        for (let i = 0; i < grupos.length; i++) {
+          const grupo = grupos[i];
+          if (grupo.length >= numAlumnos) continue;
+          const mezcla = grupo.some(miembro => miembro.tipo !== tipo);
+          if (!mezcla) {
+            grupo.push(alumno);
+            colocado = true;
+            break;
+          }
+        }
+
+        if (!colocado) {
+          const nuevo = [alumno];
+          grupos.push(nuevo);
+        }
+      });
+
+      grupos.forEach(grupo => {
+        if (grupo.length > numAlumnos) {
+          while (grupo.length > numAlumnos) {
+            sobrantes.push(grupo.pop());
+          }
+        }
+      });
+    }
+
+    function generarGruposHeterogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, totalOriginal) {
+      let numGrupos = Math.floor(totalOriginal / numAlumnos);
+      if (numGrupos === 0 && totalOriginal > 0) {
+        numGrupos = 1;
+      }
+
+      const grupos = Array.from({ length: numGrupos }, () => []);
+      const sobrantes = [];
+
+      preAsignarIncompatibles(grupos, incompatSets, numAlumnos);
+
+      distribuirAlumnosPorGrupo(listaA, grupos, numAlumnos, sobrantes);
+      distribuirAlumnosPorGrupo(listaC, grupos, numAlumnos, sobrantes);
+      distribuirAlumnosPorGrupo(listaB, grupos, numAlumnos, sobrantes);
+
+      const incompatiblesSet = new Set(incompatSets.flat().map(alumno => alumno.nombre));
+      balancearGruposHeterogeneos(grupos, incompatiblesSet);
+
+      return { grupos, sobrantes };
+    }
+
+    function generarGruposHomogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, totalOriginal) {
+      let numGrupos = Math.floor(totalOriginal / numAlumnos);
+      if (numGrupos === 0 && totalOriginal > 0) {
+        numGrupos = 1;
+      }
+
+      const grupos = Array.from({ length: numGrupos }, () => []);
+      const sobrantes = [];
+
+      preAsignarIncompatibles(grupos, incompatSets, numAlumnos);
+
+      distribuirHomogeneosPorTipo(listaA, grupos, numAlumnos, sobrantes, 'A');
+      distribuirHomogeneosPorTipo(listaB, grupos, numAlumnos, sobrantes, 'B');
+      distribuirHomogeneosPorTipo(listaC, grupos, numAlumnos, sobrantes, 'C');
+
+      return { grupos, sobrantes };
+    }
+
+    function generarGruposEsporadicos(listaRestante, numAlumnos, incompatSets, totalOriginal) {
+      let numGrupos = Math.floor(totalOriginal / numAlumnos);
+      if (numGrupos === 0 && totalOriginal > 0) {
+        numGrupos = 1;
+      }
+
+      const grupos = Array.from({ length: numGrupos }, () => []);
+      const sobrantes = [];
+
+      preAsignarIncompatibles(grupos, incompatSets, numAlumnos);
+
+      const mezcla = shuffleArray([...listaRestante]);
+      distribuirAlumnosPorGrupo(mezcla, grupos, numAlumnos, sobrantes);
+
+      return { grupos, sobrantes };
+    }
+
     function generarEquipos() {
-      const grupoA = document.getElementById('grupoA').value.split(',').map(item => item.trim()).filter(item => item !== '');
-      const grupoB = document.getElementById('grupoB').value.split(',').map(item => item.trim()).filter(item => item !== '');
-      const grupoC = document.getElementById('grupoC').value.split(',').map(item => item.trim()).filter(item => item !== '');
-      const numAlumnos = parseInt(document.getElementById('numAlumnos').value);
+      const { grupoA, grupoB, grupoC } = getStudentLists();
+      const numAlumnos = parseInt(document.getElementById('numAlumnos').value, 10) || 0;
       const tipoGrupo = document.querySelector('input[name="tipoGrupo"]:checked').value;
-      const sobrantes = document.querySelector('input[name="sobrantes"]:checked').value;
-      
+      const opcionSobrantes = document.querySelector('input[name="sobrantes"]:checked').value;
+      const lang = document.getElementById('ca-btn').classList.contains('active') ? 'ca' : 'es';
+
+      if (numAlumnos < 2) {
+        alert(lang === 'ca' ? 'El nombre mínim d’alumnes per equip és 2.' : 'El número mínimo de alumnos por equipo es 2.');
+        return null;
+      }
+
       const totalAlumnos = grupoA.length + grupoB.length + grupoC.length;
-      
-      // Mezclar los arrays para aleatorizar
-      function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
+      if (totalAlumnos === 0) {
+        alert(lang === 'ca' ? 'No hi ha alumnes per formar equips.' : 'No hay alumnos para formar equipos.');
+        return null;
       }
-      
-      const alumnosA = shuffle([...grupoA]);
-      const alumnosB = shuffle([...grupoB]);
-      const alumnosC = shuffle([...grupoC]);
-      
-      let equipos = [];
-      let alumnosRestantes = [];
-      
-      // Implementación para equipos heterogéneos
+
+      const maxGrupos = calculateMaxGroups(totalAlumnos, numAlumnos, opcionSobrantes);
+      if (maxGrupos === 0 && incompatibleGroups.length > 0) {
+        alert(translations[lang].incompatiblesWarning);
+        return null;
+      }
+
+      const hayGrupoDemasiadoGrande = incompatibleGroups.some(grupo => grupo.length > maxGrupos && maxGrupos > 0);
+      if (hayGrupoDemasiadoGrande) {
+        alert(translations[lang].incompatiblesWarning);
+        return null;
+      }
+
+      let listaAlumnosA = shuffleArray(etiquetarAlumnos(grupoA, 'A'));
+      let listaAlumnosB = shuffleArray(etiquetarAlumnos(grupoB, 'B'));
+      let listaAlumnosC = shuffleArray(etiquetarAlumnos(grupoC, 'C'));
+
+      const mapaAlumnos = new Map([
+        ...listaAlumnosA.map(alumno => [alumno.nombre, alumno]),
+        ...listaAlumnosB.map(alumno => [alumno.nombre, alumno]),
+        ...listaAlumnosC.map(alumno => [alumno.nombre, alumno])
+      ]);
+
+      const incompatSets = incompatibleGroups
+        .map(grupo => grupo.map(nombre => mapaAlumnos.get(nombre)).filter(Boolean))
+        .filter(grupo => grupo.length >= 2);
+
+      const nombresIncompatibles = new Set(incompatSets.flat().map(alumno => alumno.nombre));
+      listaAlumnosA = listaAlumnosA.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
+      listaAlumnosB = listaAlumnosB.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
+      listaAlumnosC = listaAlumnosC.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
+
+      if (tipoGrupo === 'homogeneos') {
+        const mezclaTipos = incompatSets.some(set => {
+          const tipos = new Set(set.map(alumno => alumno.tipo));
+          return tipos.size > 1;
+        });
+        if (mezclaTipos) {
+          alert(lang === 'ca' ? 'Els grups incompatibles han de ser del mateix tipus en mode homogeni.' : 'Los grupos incompatibles deben ser del mismo tipo en modo homogéneo.');
+          return null;
+        }
+      }
+
+      const totalOriginal = totalAlumnos;
+      let resultado;
+
       if (tipoGrupo === 'heterogeneos') {
-        // Cálculo de distribución ideal
-        const numEquipos = Math.floor(totalAlumnos / numAlumnos);
-        const disA = Math.max(1, Math.round(grupoA.length / numEquipos));
-        const disC = Math.max(1, Math.round(grupoC.length / numEquipos));
-        
-        // Crear equipos heterogéneos
-        for (let i = 0; i < numEquipos; i++) {
-          let equipo = [];
-          
-          // Agregar alumnos de tipo A
-          for (let j = 0; j < disA && alumnosA.length > 0; j++) {
-            if (equipo.length < numAlumnos) {
-              equipo.push(alumnosA.pop());
-            } else {
-              alumnosRestantes.push(alumnosA.pop());
-            }
-          }
-          
-          // Agregar alumnos de tipo C
-          for (let j = 0; j < disC && alumnosC.length > 0; j++) {
-            if (equipo.length < numAlumnos) {
-              equipo.push(alumnosC.pop());
-            } else {
-              alumnosRestantes.push(alumnosC.pop());
-            }
-          }
-          
-          // Completar con alumnos de tipo B
-          while (equipo.length < numAlumnos && alumnosB.length > 0) {
-            equipo.push(alumnosB.pop());
-          }
-          
-          equipos.push(equipo);
-        }
-        
-        // Agregar alumnos restantes
-        alumnosRestantes = alumnosRestantes.concat(alumnosA, alumnosB, alumnosC);
-        
+        resultado = generarGruposHeterogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, totalOriginal);
       } else if (tipoGrupo === 'homogeneos') {
-        // Implementación para equipos homogéneos
-        const alumnosTodos = [...alumnosA, ...alumnosB, ...alumnosC];
-        const numEquipos = Math.floor(alumnosTodos.length / numAlumnos);
-        
-        for (let i = 0; i < numEquipos; i++) {
-          let equipo = [];
-          for (let j = 0; j < numAlumnos && alumnosTodos.length > 0; j++) {
-            equipo.push(alumnosTodos.pop());
-          }
-          equipos.push(equipo);
-        }
-        
-        alumnosRestantes = [...alumnosTodos];
-        
-      } else if (tipoGrupo === 'esporadicos') {
-        // Implementación para equipos esporádicos (mezclados aleatoriamente)
-        const alumnosTodos = shuffle([...alumnosA, ...alumnosB, ...alumnosC]);
-        const numEquipos = Math.floor(alumnosTodos.length / numAlumnos);
-        
-        for (let i = 0; i < numEquipos; i++) {
-          let equipo = [];
-          for (let j = 0; j < numAlumnos && alumnosTodos.length > 0; j++) {
-            equipo.push(alumnosTodos.pop());
-          }
-          equipos.push(equipo);
-        }
-        
-        alumnosRestantes = [...alumnosTodos];
+        resultado = generarGruposHomogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, totalOriginal);
+      } else {
+        const combinados = [...listaAlumnosA, ...listaAlumnosB, ...listaAlumnosC];
+        resultado = generarGruposEsporadicos(combinados, numAlumnos, incompatSets, totalOriginal);
       }
-      
-      // Manejar alumnos sobrantes
-      if (sobrantes === 'grupoNuevo' && alumnosRestantes.length > 0) {
-        equipos.push(alumnosRestantes);
-      } else if (sobrantes === 'agregar' && alumnosRestantes.length > 0) {
-        let i = 0;
-        while (alumnosRestantes.length > 0) {
-          equipos[i % equipos.length].push(alumnosRestantes.pop());
-          i++;
-        }
+
+      if (!resultado) {
+        return null;
       }
-      
-      return equipos;
+
+      const grupos = manejarSobrantes(resultado.grupos, opcionSobrantes, numAlumnos, resultado.sobrantes);
+      return grupos;
     }
 
     // Función para generar y mostrar equipos
     function generarYMostrarEquipos() {
-      const grupoA = document.getElementById('grupoA').value.split(',').map(item => item.trim()).filter(item => item !== '');
-      const grupoB = document.getElementById('grupoB').value.split(',').map(item => item.trim()).filter(item => item !== '');
-      const grupoC = document.getElementById('grupoC').value.split(',').map(item => item.trim()).filter(item => item !== '');
-      const numAlumnos = parseInt(document.getElementById('numAlumnos').value);
-      const totalAlumnos = grupoA.length + grupoB.length + grupoC.length;
-      const numEquipos = Math.floor(totalAlumnos / numAlumnos);
-      const lang = document.getElementById('es-btn').classList.contains('active') ? 'es' : 'ca';
-      
-      // Actualizar información sobre los grupos
       updateInfoGrupos();
-      
-      // Generar equipos
+
       const equipos = generarEquipos();
-      
-      // Mostrar los equipos
-      mostrarEquipos(equipos, grupoA, grupoB, grupoC);
+      if (!equipos) {
+        return;
+      }
+
+      mostrarEquipos(equipos);
     }
 
     // Función para mostrar equipos en pantalla
-    function mostrarEquipos(equipos, grupoA, grupoB, grupoC) {
+    function mostrarEquipos(equipos) {
       const resultadosDiv = document.getElementById('resultados');
       resultadosDiv.innerHTML = '';
       
-      const lang = document.getElementById('es-btn').classList.contains('active') ? 'es' : 'ca';
+      const lang = document.getElementById('ca-btn').classList.contains('active') ? 'ca' : 'es';
       
       // Crear tabla de equipos
       const table = document.createElement('table');
@@ -987,25 +1520,11 @@
           cellNum.textContent = `Equip ${index + 1}:`;
         }
         
-        // Mostrar tipología de cada alumno
-        let miembrosTexto = "";
-        equipo.forEach((alumno, i) => {
-          // Determinar la tipología del alumno
-          let tipologia = '';
-          if (grupoA.includes(alumno)) {
-            tipologia = '(A)';
-          } else if (grupoB.includes(alumno)) {
-            tipologia = '(B)';
-          } else if (grupoC.includes(alumno)) {
-            tipologia = '(C)';
-          }
-          
-          miembrosTexto += `${tipologia} ${alumno}`;
-          if (i < equipo.length - 1) {
-            miembrosTexto += ', ';
-          }
-        });
-        
+        const miembrosTexto = equipo
+          .map(alumno => `(${alumno.tipo}) ${alumno.nombre}`)
+          .sort((a, b) => a.localeCompare(b, lang === 'ca' ? 'ca' : 'es', { sensitivity: 'base' }))
+          .join(', ');
+
         cellMiembros.textContent = miembrosTexto;
       });
       
@@ -1020,40 +1539,21 @@
       
       // Añadir evento para copiar al portapapeles
       document.getElementById('copiarEquipos').addEventListener('click', function() {
-        copiarEquipos(equipos, grupoA, grupoB, grupoC);
+        copiarEquipos(equipos);
       });
     }
 
     // Función para copiar equipos al portapapeles
-    function copiarEquipos(equipos, grupoA, grupoB, grupoC) {
-      const lang = document.getElementById('es-btn').classList.contains('active') ? 'es' : 'ca';
+    function copiarEquipos(equipos) {
+      const lang = document.getElementById('ca-btn').classList.contains('active') ? 'ca' : 'es';
       let textoCopiar = '';
       
       equipos.forEach((equipo, index) => {
-        if (lang === 'es') {
-          textoCopiar += `Equipo ${index + 1}: `;
-        } else {
-          textoCopiar += `Equip ${index + 1}: `;
-        }
-        
-        let miembrosTexto = "";
-        equipo.forEach((alumno, i) => {
-          // Determinar la tipología del alumno
-          let tipologia = '';
-          if (grupoA.includes(alumno)) {
-            tipologia = '(A)';
-          } else if (grupoB.includes(alumno)) {
-            tipologia = '(B)';
-          } else if (grupoC.includes(alumno)) {
-            tipologia = '(C)';
-          }
-          
-          miembrosTexto += `${tipologia} ${alumno}`;
-          if (i < equipo.length - 1) {
-            miembrosTexto += ', ';
-          }
-        });
-        
+        textoCopiar += lang === 'es' ? `Equipo ${index + 1}: ` : `Equip ${index + 1}: `;
+        const miembrosTexto = equipo
+          .map(alumno => `(${alumno.tipo}) ${alumno.nombre}`)
+          .sort((a, b) => a.localeCompare(b, lang === 'ca' ? 'ca' : 'es', { sensitivity: 'base' }))
+          .join(', ');
         textoCopiar += miembrosTexto + '\n';
       });
       
