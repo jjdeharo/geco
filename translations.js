@@ -77,7 +77,7 @@ const TRANSLATIONS = {
     },
     assignModal: {
       openButton: 'Asignar tipologías',
-      helper: 'Puedes escribir los nombres en las tres tipologías o importar una hoja de cálculo y ajustar tipologías en la ventana.',
+      helper: 'Escribe los nombres en las tres tipologías y ajústalas en la ventana de asignación.',
       title: 'Asignar tipologías',
       description: 'Edita los nombres y selecciona la tipología adecuada para cada alumno. Los cambios se guardan automáticamente.',
       closeButton: 'Cerrar'
@@ -219,7 +219,7 @@ const TRANSLATIONS = {
     },
     assignModal: {
       openButton: 'Assignar tipologies',
-      helper: 'Pots escriure els noms a les tres tipologies o importar un full de càlcul i ajustar les tipologies a la finestra.',
+      helper: "Escriu els noms a les tres tipologies i ajusta-les a la finestra d'assignació.",
       title: 'Assignar tipologies',
       description: 'Edita els noms i selecciona la tipologia adequada per a cada alumne. Els canvis es guarden automàticament.',
       closeButton: 'Tanca'
@@ -358,7 +358,7 @@ const TRANSLATIONS = {
     },
     assignModal: {
       openButton: 'Assign typologies',
-      helper: 'You can type names in the three typologies or import a spreadsheet and adjust typologies in the window.',
+      helper: 'Type names in the three typologies and adjust them in the assignment window.',
       title: 'Assign typologies',
       description: 'Edit the names and pick the right typology for each student. Changes are saved automatically.',
       closeButton: 'Close'
@@ -497,7 +497,7 @@ const TRANSLATIONS = {
     },
     assignModal: {
       openButton: 'Asignar tipoloxías',
-      helper: 'Podes escribir nomes nas tres tipoloxías ou importar unha folla de cálculo e axustar as tipoloxías na xanela.',
+      helper: 'Escribe os nomes nas tres tipoloxías e axústaas na xanela de asignación.',
       title: 'Asignar tipoloxías',
       description: 'Edita os nomes e selecciona a tipoloxía axeitada para cada alumno. Os cambios gárdanse automaticamente.',
       closeButton: 'Pechar'
@@ -636,7 +636,7 @@ const TRANSLATIONS = {
     },
     assignModal: {
       openButton: 'Tipologiak esleitu',
-      helper: 'Hiru tipologietan izenak idatz ditzakezu edo kalkulu-orria inportatu eta leihoan tipologiak doitu.',
+      helper: 'Idatzi izenak hiru tipologietan eta doituak esleipen leihoan.',
       title: 'Tipologiak esleitu',
       description: 'Editatu izenak eta aukeratu ikasle bakoitzarentzako tipologia egokia. Aldaketak automatikoki gordetzen dira.',
       closeButton: 'Itxi'
