@@ -7,7 +7,9 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <style>
     :root {
-      --primary-color: #4a6fa5;
+      /* Acciones (botones) */
+      --primary-color: #2563eb;           /* blue-600 */
+      --primary-color-hover: #1d4ed8;     /* blue-700 */
       --secondary-color: #2c3e50;
       --background-color: #f5f7fa;
       --text-color: #333;
@@ -15,6 +17,8 @@
       --success-color: #2ecc71;
       --light-color: #ecf0f1;
       --accent-color: #e67e22;
+      /* Cabeceras/barras (diferentes de botones) */
+      --header-color: #334155;            /* slate-700 */
       --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
@@ -95,6 +99,99 @@
     .card:hover {
       transform: translateY(-3px);
     }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .typology-helper {
+      margin-top: 5px;
+      color: var(--secondary-color);
+      font-size: 0.95rem;
+    }
+
+    /* Previously hidden; now visible so names can be typed manually */
+    .hidden-inputs {
+      display: block;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      color: var(--secondary-color);
+    }
+
+    .modal-close {
+      border: none;
+      background: none;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--secondary-color);
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-description {
+      margin-bottom: 15px;
+      color: var(--text-color);
+    }
+
+    .modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-table {
+      margin-top: 10px;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
     
     .typology-grid {
       display: grid;
@@ -154,6 +251,156 @@
     .selector-bubbles {
       flex: 2;
     }
+    .bulk-table-container {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    .bulk-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .bulk-table th,
+    .bulk-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    .bulk-table th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .bulk-table tbody tr:hover {
+      background-color: #f8f9fb;
+    }
+
+    .bulk-table input[type="text"] {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-family: inherit;
+    }
+
+    .bulk-table .row-delete {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: #e74c3c;
+      color: white;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .bulk-table .row-delete:hover {
+      background-color: #c0392b;
+    }
+
+    .type-toggle {
+      width: 100%;
+      padding: 6px 0;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      /* Asegura altura y área de clic uniforme */
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .type-toggle.selected {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .type-toggle:not(.selected):hover {
+      border-color: var(--border-color);
+    }
+
+    .type-toggle:not(.selected) {
+      color: #94a3b8;
+      opacity: 0.7;
+    }
+
+    .type-column {
+      text-align: center;
+      white-space: nowrap;
+      min-width: 120px;
+    }
+
+    .bulk-table th { vertical-align: middle; }
+
+    /* Alineación vertical en la tabla para que coincidan alturas */
+    .bulk-table td {
+      vertical-align: middle;
+    }
+
+    .type-column small {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--secondary-color);
+      font-weight: 400;
+    }
+
+    .import-options {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .import-block {
+      background-color: var(--light-color);
+      border-radius: 10px;
+      padding: 15px;
+      border: 1px solid var(--border-color);
+    }
+
+    .import-block h3 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: var(--secondary-color);
+    }
+
+    .import-textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    .import-status {
+      margin-top: 12px;
+      min-height: 1.2rem;
+      font-size: 0.95rem;
+      color: var(--secondary-color);
+    }
+
+    .import-status.success {
+      color: var(--success-color);
+    }
+
+    .import-status.error {
+      color: #c0392b;
+    }
+
     
     @media (max-width: 768px) {
       .members-selector-container {
@@ -245,7 +492,7 @@
     .option-title {
       font-weight: 600;
       color: white;
-      background-color: var(--primary-color);
+      background-color: var(--header-color);
       padding: 10px 15px;
       font-size: 0.95rem;
     }
@@ -307,7 +554,7 @@
     }
     
     .generate-btn:hover {
-      background-color: #3d5f8a;
+      background-color: var(--primary-color-hover);
       transform: translateY(-2px);
     }
     
@@ -315,11 +562,12 @@
       .options-container {
         flex-direction: column;
       }
-      
+
       .options-column:first-child {
         border-right: none;
         border-bottom: 1px solid var(--border-color);
       }
+
     }
 
     .btn {
@@ -338,21 +586,48 @@
       text-align: center;
       transition: background-color 0.3s, transform 0.2s;
     }
+
+    /* Evitar márgenes verticales en botones del encabezado */
+    .header-container .btn { margin: 0; }
     
     .btn:hover {
-      background-color: #3d5f8a;
+      background-color: var(--primary-color-hover);
       transform: translateY(-2px);
     }
     
     #generarGrupos {
       display: block;
       margin: 0 auto 20px;
+      background-color: var(--success-color);
+      box-shadow: 0 6px 16px rgba(46, 204, 113, 0.35);
+      letter-spacing: 0.2px;
     }
 
-    #copiarEquipos {
-      display: block;
-      margin: 20px auto 0;
+    #generarGrupos:hover {
+      background-color: #27ae60;
+      box-shadow: 0 8px 20px rgba(39, 174, 96, 0.45);
     }
+
+    #generarGrupos:focus-visible {
+      outline: 3px solid rgba(46, 204, 113, 0.45);
+      outline-offset: 2px;
+    }
+
+    /* Contenedor de acciones bajo la tabla de equipos */
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    /* Botones dentro del contenedor: sin márgenes desiguales */
+    .result-actions .btn { margin: 0; }
+
+    /* Evita que el botón de copiar se centre en bloque */
+    #copiarEquipos { margin: 0; display: inline-block; }
 
     .info-columns {
       display: flex;
@@ -368,7 +643,7 @@
       color: white;
       font-weight: 500;
       text-align: center;
-      background-color: var(--primary-color);
+      background-color: var(--header-color);
       padding: 12px;
       border-radius: 6px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -383,7 +658,7 @@
       color: white;
       font-weight: 500;
       text-align: center;
-      background-color: var(--secondary-color);
+      background-color: var(--header-color);
       padding: 12px;
       border-radius: 6px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -476,6 +751,9 @@
       transform: translateY(-2px);
     }
 
+    /* Ocultar antiguos botones de importación/exportación específicos */
+    #openImportModal, #downloadAssignmentsBtn { display: none; }
+
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -561,6 +839,17 @@
       gap: 8px;
     }
 
+    /* Compactar la sección de incompatibles en dos columnas */
+    .incompatibles-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .incompatibles-grid { grid-template-columns: 1fr; }
+    }
+
     .incompatibles-group {
       display: flex;
       justify-content: space-between;
@@ -601,6 +890,13 @@
       color: var(--secondary-color);
     }
 
+    .group-count {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: var(--secondary-color);
+      text-align: right;
+    }
+
     @media (max-width: 768px) {
       .incompatibles-controls {
         flex-direction: column;
@@ -622,24 +918,57 @@
       <div class="language-switcher" id="languageSwitcher"></div>
     </div>
 
-    <div class="card">
+    <div class="card" id="stateCard">
+      <div class="card-header">
+        <h2 id="state-title" data-i18n="state.title">Datos del alumnado</h2>
+      </div>
+      <div class="state-grid">
+        <div class="state-col">
+          <p id="state-legend" class="state-legend" data-i18n="state.legend">Puedes importar un archivo de exportación de GeCo (.json) o pegar los nombres en la caja de la derecha. Se guardarán nombres, tipologías, grupos incompatibles y equipos.</p>
+          <div class="state-actions">
+            <button id="openFullImportBtn2" type="button" class="btn" data-i18n="topButtons.importAll">Importar</button>
+            <button id="exportAllBtn2" type="button" class="btn" data-i18n="topButtons.exportAll">Exportar</button>
+            <button id="resetAppBtn" type="button" class="reset-btn" data-i18n="state.resetButton">Reiniciar aplicación</button>
+          </div>
+        </div>
+        <div class="state-col">
+          <div class="import-block">
+            <h3 data-i18n="state.pasteTitle">O pegar nombres del alumnado</h3>
+            <textarea id="quickPasteNames" class="import-textarea" placeholder="Un nombre por línea" data-i18n-placeholder="state.pastePlaceholder"></textarea>
+            <button id="quickPasteBtn" type="button" class="btn" data-i18n="state.pasteButton">Cargar nombres</button>
+            <p id="quickPasteStatus" class="import-status" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="typologyCard">
       <div class="card-header">
         <h2 id="groups-title" data-i18n="groupsTitle">Grupos de estudiantes</h2>
-        <button id="clearAllBtn" class="clear-all-btn" data-i18n="clearAll">Borrar todos los nombres</button>
+        <div class="card-actions">
+          <button id="openImportModal" type="button" class="btn" data-i18n="bulkInput.openButton">Importar hoja de cálculo</button>
+          <button id="openTypologyModal" type="button" class="btn" data-i18n="assignModal.openButton">Asignar tipologías</button>
+          <button id="clearAllBtn" class="clear-all-btn" data-i18n="clearAll">Borrar todos los nombres</button>
+        </div>
       </div>
 
-      <div class="typology-grid">
-        <div class="typology-column">
-          <div class="form-group">
-            <label for="grupoA" id="label-group-a" data-i18n="groupALabel" data-i18n-type="html"><strong>Tipología A</strong> (no necesitan ayuda):</label>
-            <textarea id="grupoA" rows="4">Ana, Pedro, María, Luis</textarea>
-          </div>
+      <p class="typology-helper" data-i18n="assignModal.helper">Puedes escribir nombres en las tres tipologías o importar una hoja de cálculo y ajustar tipologías en la ventana.</p>
+
+      <div class="hidden-inputs">
+        <div class="typology-grid">
+          <div class="typology-column">
+            <div class="form-group">
+              <label for="grupoA" id="label-group-a" data-i18n="groupALabel" data-i18n-type="html"><strong>Tipología A</strong> (no necesitan ayuda):</label>
+              <textarea id="grupoA" rows="4">Ana, Pedro, María, Luis</textarea>
+              <div class="group-count" id="countA"></div>
+            </div>
         </div>
         
         <div class="typology-column">
           <div class="form-group">
             <label for="grupoB" id="label-group-b" data-i18n="groupBLabel" data-i18n-type="html"><strong>Tipología B</strong> (necesitan alguna ayuda):</label>
             <textarea id="grupoB" rows="4">Lucía, Carlos, Marta, Juan, Sofía, Miguel, Elena, Pablo, Laura, Alejandro, Carmen, David, Raquel, Andrea, Jorge</textarea>
+            <div class="group-count" id="countB"></div>
           </div>
         </div>
         
@@ -647,8 +976,10 @@
           <div class="form-group">
             <label for="grupoC" id="label-group-c" data-i18n="groupCLabel" data-i18n-type="html"><strong>Tipología C</strong> (necesitan ayuda):</label>
             <textarea id="grupoC" rows="4">Isabel, Guillermo, Martín, Irene, Daniel, Teresa, Javier</textarea>
+            <div class="group-count" id="countC"></div>
           </div>
         </div>
+      </div>
       </div>
       
       <div class="members-selector-container">
@@ -684,17 +1015,23 @@
         <h2 id="incompatiblesTitle" data-i18n="incompatiblesTitle">Personas incompatibles</h2>
         <button id="clearIncompatiblesBtn" class="clear-all-btn" type="button" data-i18n="incompatiblesClear">Vaciar incompatibles</button>
       </div>
-      <p id="incompatiblesDescription" class="incompatibles-description" data-i18n="incompatiblesDescription">
-        Selecciona varias personas (Ctrl o Shift + clic) y crea grupos que no deban coincidir en un mismo equipo.
-      </p>
-      <div class="incompatibles-controls">
-        <select id="incompatiblesSelect" multiple></select>
-        <div class="incompatibles-buttons">
-          <button id="addIncompatibleBtn" class="btn btn-inline" type="button" data-i18n="incompatiblesAdd">Crear grupo incompatible</button>
+      <div class="incompatibles-grid">
+        <div class="incompatibles-left">
+          <p id="incompatiblesDescription" class="incompatibles-description" data-i18n="incompatiblesDescription">
+            Selecciona varias personas (Ctrl o Shift + clic) y crea grupos que no deban coincidir en un mismo equipo.
+          </p>
+          <div class="incompatibles-controls">
+            <select id="incompatiblesSelect" multiple></select>
+            <div class="incompatibles-buttons">
+              <button id="addIncompatibleBtn" class="btn btn-inline" type="button" data-i18n="incompatiblesAdd">Crear grupo incompatible</button>
+            </div>
+          </div>
+        </div>
+        <div class="incompatibles-right">
+          <p id="incompatibles-limit" class="incompatibles-info"></p>
+          <div id="incompatiblesList" class="incompatibles-list"></div>
         </div>
       </div>
-      <p id="incompatibles-limit" class="incompatibles-info"></p>
-      <div id="incompatiblesList" class="incompatibles-list"></div>
     </div>
 
     <div class="options-container">
@@ -739,6 +1076,82 @@
     
     <div id="copySuccess" class="success-message"></div>
 
+    <div id="importModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="importModalTitle">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="importModalTitle" class="modal-title" data-i18n="bulkInput.modalTitle">Añade tu hoja de cálculo</h2>
+          <button id="importModalClose" type="button" class="modal-close" aria-label="Cerrar">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-description" data-i18n="bulkInput.replaceNotice">La importación sustituye al alumnado actual.</p>
+          <div class="import-options">
+            <section class="import-block">
+              <h3 data-i18n="bulkInput.pasteTitle">Pegar datos desde la hoja de cálculo</h3>
+              <textarea id="importTextarea" class="import-textarea" placeholder="Nombre [tab] Tipología" data-i18n-placeholder="bulkInput.pastePlaceholder"></textarea>
+              <button id="importPasteBtn" type="button" class="btn" data-i18n="bulkInput.parseButton">Cargar alumnado</button>
+            </section>
+            <section class="import-block">
+              <h3 data-i18n="bulkInput.fileTitle">Abrir una hoja de cálculo</h3>
+              <input id="importFileInput" type="file" accept=".csv,text/csv" />
+              <button id="importFileBtn" type="button" class="btn" data-i18n="bulkInput.fileButton">Seleccionar archivo</button>
+              <p class="typology-helper" data-i18n="bulkInput.fileHint">Usa un archivo CSV exportado desde tu hoja de cálculo.</p>
+            </section>
+          </div>
+          <p id="importStatus" class="import-status" aria-live="polite"></p>
+        </div>
+        <div class="modal-footer">
+          <button id="importModalDone" type="button" class="btn" data-i18n="bulkInput.closeButton">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="typologyModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="typologyModalTitle">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="typologyModalTitle" class="modal-title" data-i18n="assignModal.title">Asignar tipologías</h2>
+          <button id="typologyModalClose" type="button" class="modal-close" aria-label="Cerrar">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-description" data-i18n="assignModal.description">Edita los nombres y selecciona la tipología adecuada para cada alumno. Los cambios se guardan automáticamente.</p>
+          <div id="bulkTableContainer" class="bulk-table-container modal-table"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="downloadAssignmentsBtn" type="button" class="btn" data-i18n="bulkInput.downloadButton">Descargar hoja de cálculo</button>
+          <button id="typologyModalDone" type="button" class="btn" data-i18n="assignModal.closeButton">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de importación completa -->
+    <div id="fullImportModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="fullImportTitle">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="fullImportTitle" class="modal-title" data-i18n="fullImport.title">Importar datos</h2>
+          <button id="fullImportClose" type="button" class="modal-close" aria-label="Cerrar">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-description" data-i18n="fullImport.description">Selecciona qué datos quieres importar. Todo viene marcado por defecto.</p>
+          <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+            <div>
+              <label><input type="checkbox" id="importNamesChk" checked> <span data-i18n="fullImport.options.names">Nombres</span></label><br>
+              <label><input type="checkbox" id="importTypesChk" checked> <span data-i18n="fullImport.options.types">Tipología</span></label><br>
+              <label><input type="checkbox" id="importIncompatChk" checked> <span data-i18n="fullImport.options.incompat">Incompatibilidades</span></label><br>
+              <label><input type="checkbox" id="importTeamsChk" checked> <span data-i18n="fullImport.options.teams">Equipos</span></label>
+            </div>
+            <div>
+              <input id="fullImportFileInput" type="file" accept="application/json,text/json,.json" />
+              <button id="fullImportFileBtn" type="button" class="btn" data-i18n="fullImport.fileButton">Seleccionar archivo</button>
+            </div>
+          </div>
+          <p id="fullImportStatus" class="import-status" aria-live="polite"></p>
+        </div>
+        <div class="modal-footer">
+          <button id="fullImportApply" type="button" class="btn" data-i18n="fullImport.applyButton">Importar</button>
+          <button id="fullImportCancel" type="button" class="btn" data-i18n="fullImport.cancelButton">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
     <footer>
       <section class="licenses-summary" aria-labelledby="licenses-heading">
         <h2 id="licenses-heading" data-i18n="footer.heading">Generador de equipos cooperativos</h2>
@@ -748,6 +1161,28 @@
       </section>
     </footer>
   </div>
+  <style>
+    .state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 768px) { .state-grid { grid-template-columns: 1fr; } }
+    .state-legend { color: var(--secondary-color); margin-bottom: 10px; }
+    .state-actions { display: flex; flex-direction: column; gap: 10px; }
+    .state-actions .btn { width: 100%; margin: 0; }
+    .state-actions .reset-btn {
+      width: 100%;
+      padding: 10px 20px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      transition: background-color 0.3s, transform 0.2s;
+      margin-top: 8px; /* un poco más separado */
+    }
+    .state-actions .reset-btn:hover { background-color: #c0392b; transform: translateY(-2px); }
+  </style>
   <script src="translations.js"></script>
   <script src="main.js"></script>
 </body>

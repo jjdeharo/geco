@@ -19,7 +19,69 @@ const TRANSLATIONS = {
     addToOthersLabel: 'Agregar a otros equipos',
     generateButton: 'Generar equipos',
     copyButton: 'Copiar equipos',
+    exportTeamsButton: 'Exportar equipos a hoja de cálculo',
+    topButtons: {
+      exportAll: 'Exportar todo (formato JSON)',
+      importAll: 'Importar archivo (exportado en JSON)'
+    },
+    fullImport: {
+      title: 'Importar datos',
+      description: 'Selecciona qué datos quieres importar. Todo viene marcado por defecto.',
+      fileButton: 'Seleccionar archivo',
+      applyButton: 'Importar',
+      cancelButton: 'Cancelar',
+      options: {
+        names: 'Nombres',
+        types: 'Tipología',
+        incompat: 'Incompatibilidades',
+        teams: 'Equipos'
+      },
+      status: {
+        ready: 'Archivo cargado. Elige qué importar.',
+        invalid: 'Archivo no válido.',
+        readError: 'No se pudo leer el archivo.',
+        noData: 'Primero selecciona un archivo válido.',
+        done: 'Importación finalizada.'
+      }
+    },
     copySuccess: 'Equipos copiados al portapapeles',
+    bulkInput: {
+      openButton: 'Importar hoja de cálculo',
+      modalTitle: 'Añade tu hoja de cálculo',
+      replaceNotice: 'La importación sustituye al alumnado actual.',
+      pasteTitle: 'Pegar datos desde la hoja de cálculo',
+      pastePlaceholder: 'Nombre\tTipología (opcional)',
+      parseButton: 'Cargar alumnado',
+      fileTitle: 'Abrir una hoja de cálculo',
+      fileButton: 'Seleccionar archivo',
+      fileHint: 'Usa un archivo CSV exportado desde tu hoja de cálculo.',
+      closeButton: 'Cerrar',
+      downloadButton: 'Descargar hoja de cálculo',
+      csvHeader: 'Nombre;Tipología',
+      emptyTable: 'No hay alumnado en la tabla. Importa o añade nombres para empezar.',
+      deleteRow: 'Quitar',
+      table: {
+        name: 'Alumno',
+        typeA: 'Tipología A',
+        typeB: 'Tipología B',
+        typeC: 'Tipología C',
+        actions: 'Acciones'
+      },
+      status: {
+        parsed: 'Se han importado {count} alumnos.',
+        noRows: 'No se detectaron datos válidos para importar.',
+        fileType: 'Selecciona un archivo CSV válido.',
+        fileRead: 'No se pudo leer el archivo seleccionado.',
+        cleared: 'El alumnado se ha vaciado.'
+      }
+    },
+    assignModal: {
+      openButton: 'Asignar tipologías',
+      helper: 'Puedes escribir los nombres en las tres tipologías o importar una hoja de cálculo y ajustar tipologías en la ventana.',
+      title: 'Asignar tipologías',
+      description: 'Edita los nombres y selecciona la tipología adecuada para cada alumno. Los cambios se guardan automáticamente.',
+      closeButton: 'Cerrar'
+    },
     incompatiblesTitle: 'Personas incompatibles',
     incompatiblesDescription: 'Selecciona varias personas (Ctrl o Shift + clic) y crea grupos que no deban coincidir en un mismo equipo.',
     incompatiblesAdd: 'Crear grupo incompatible',
@@ -31,6 +93,7 @@ const TRANSLATIONS = {
     incompatiblesDuplicate: 'Alguna persona ya está en otro grupo incompatible.',
     infoGroups: 'Equipos: {teams} | Sobran: {leftovers}',
     infoTotals: 'Total: {total} personas (A: {countA}, B: {countB}, C: {countC})',
+    groupCount: 'Alumnos: {count}',
     teamLabel: 'Equipo {index}',
     incompatiblesGroupLabel: 'Grupo {index}',
     removeIncompatibleAria: 'Eliminar grupo incompatible {index}',
@@ -74,6 +137,20 @@ const TRANSLATIONS = {
         randomSize: 'El equipo {team} tiene {size} miembros (objetivo {target}).'
       }
     }
+    ,
+    state: {
+      title: 'Datos del alumnado',
+      legend: 'Puedes importar un archivo de exportación de GeCo (.json) o pegar los nombres en la caja de la derecha. Se guardarán nombres, tipologías, grupos incompatibles y equipos.',
+      pasteTitle: 'O pegar nombres del alumnado',
+      pastePlaceholder: 'Un nombre por línea',
+      pasteButton: 'Cargar nombres',
+      pasteHint: 'Un nombre por línea. Las comas no separan.',
+      resetButton: 'Reiniciar aplicación',
+      status: {
+        parsed: 'Se han cargado {count} nombres.',
+        noRows: 'No hay nombres para cargar.'
+      }
+    }
   },
   ca: {
     languageName: 'CA',
@@ -95,7 +172,58 @@ const TRANSLATIONS = {
     addToOthersLabel: 'Afegir a altres equips',
     generateButton: 'Generar equips',
     copyButton: 'Copiar equips',
+    exportTeamsButton: 'Exportar equips a full de càlcul',
+    topButtons: {
+      exportAll: 'Exportar tot (format JSON)',
+      importAll: 'Importar fitxer (exportat en JSON)'
+    },
+    fullImport: {
+      title: 'Importar dades',
+      description: 'Selecciona quines dades vols importar. Tot ve marcat per defecte.',
+      fileButton: 'Selecciona fitxer',
+      applyButton: 'Importa',
+      cancelButton: 'Cancel·la',
+      options: { names: 'Noms', types: 'Tipologia', incompat: 'Incompatibilitats', teams: 'Equips' },
+      status: { ready: 'Fitxer carregat. Tria què importar.', invalid: 'Fitxer no vàlid.', readError: 'No s\'ha pogut llegir el fitxer.', noData: 'Selecciona un fitxer vàlid.', done: 'Importació finalitzada.' }
+    },
     copySuccess: 'Equips copiats al portapapers',
+    bulkInput: {
+      openButton: "Importar full de càlcul",
+      modalTitle: "Afegeix el teu full de càlcul",
+      replaceNotice: "La importació substitueix l'alumnat actual.",
+      pasteTitle: 'Enganxa dades des del full de càlcul',
+      pastePlaceholder: 'Nom\tTipologia (opcional)',
+      parseButton: 'Carrega alumnat',
+      fileTitle: "Obre un full de càlcul",
+      fileButton: 'Selecciona fitxer',
+      fileHint: 'Fes servir un fitxer CSV exportat del teu full de càlcul.',
+      closeButton: 'Tanca',
+      downloadButton: 'Descarrega el full de càlcul',
+      csvHeader: 'Nom;Tipologia',
+      emptyTable: "No hi ha alumnat a la taula. Importa o afegeix noms per començar.",
+      deleteRow: 'Treure',
+      table: {
+        name: 'Alumne',
+        typeA: 'Tipologia A',
+        typeB: 'Tipologia B',
+        typeC: 'Tipologia C',
+        actions: 'Accions'
+      },
+      status: {
+        parsed: "S'han importat {count} alumnes.",
+        noRows: 'No s\'han detectat dades vàlides per importar.',
+        fileType: 'Selecciona un fitxer CSV vàlid.',
+        fileRead: 'No s\'ha pogut llegir el fitxer seleccionat.',
+        cleared: "L'alumnat s'ha buidat."
+      }
+    },
+    assignModal: {
+      openButton: 'Assignar tipologies',
+      helper: 'Pots escriure els noms a les tres tipologies o importar un full de càlcul i ajustar les tipologies a la finestra.',
+      title: 'Assignar tipologies',
+      description: 'Edita els noms i selecciona la tipologia adequada per a cada alumne. Els canvis es guarden automàticament.',
+      closeButton: 'Tanca'
+    },
     incompatiblesTitle: 'Persones incompatibles',
     incompatiblesDescription: 'Selecciona diverses persones (Ctrl o Shift + clic) i crea grups que no han de coincidir al mateix equip.',
     incompatiblesAdd: 'Crear grup incompatible',
@@ -107,6 +235,7 @@ const TRANSLATIONS = {
     incompatiblesDuplicate: "Alguna persona ja forma part d'un altre grup incompatible.",
     infoGroups: 'Equips: {teams} | Sobren: {leftovers}',
     infoTotals: 'Total: {total} persones (A: {countA}, B: {countB}, C: {countC})',
+    groupCount: 'Alumnes: {count}',
     teamLabel: 'Equip {index}',
     incompatiblesGroupLabel: 'Grup {index}',
     removeIncompatibleAria: 'Eliminar grup incompatible {index}',
@@ -150,6 +279,20 @@ const TRANSLATIONS = {
         randomSize: "L'equip {team} té {size} membres (objectiu {target})."
       }
     }
+    ,
+    state: {
+      title: 'Dades de l\'alumnat',
+      legend: "Pots importar un fitxer d'exportació de GeCo (.json) o enganxar els noms a la caixa de la dreta. Es desaran noms, tipologies, grups incompatibles i equips.",
+      pasteTitle: "O enganxa els noms de l'alumnat",
+      pastePlaceholder: 'Un nom per línia',
+      pasteButton: 'Carregar noms',
+      pasteHint: 'Un nom per línia. Les comes no separen.',
+      resetButton: 'Reiniciar l\'aplicació',
+      status: {
+        parsed: "S'han carregat {count} noms.",
+        noRows: 'No hi ha noms per carregar.'
+      }
+    }
   },
   en: {
     languageName: 'EN',
@@ -171,7 +314,55 @@ const TRANSLATIONS = {
     addToOthersLabel: 'Add to other teams',
     generateButton: 'Generate teams',
     copyButton: 'Copy teams',
+    exportTeamsButton: 'Export teams to spreadsheet',
+    topButtons: { exportAll: 'Export all (JSON)', importAll: 'Import exported JSON file' },
+    fullImport: {
+      title: 'Import data',
+      description: 'Select which data to import. Everything is checked by default.',
+      fileButton: 'Choose file',
+      applyButton: 'Import',
+      cancelButton: 'Cancel',
+      options: { names: 'Names', types: 'Typology', incompat: 'Incompatibilities', teams: 'Teams' },
+      status: { ready: 'File loaded. Choose what to import.', invalid: 'Invalid file.', readError: 'Could not read the file.', noData: 'Select a valid file first.', done: 'Import complete.' }
+    },
     copySuccess: 'Teams copied to the clipboard',
+    bulkInput: {
+      openButton: 'Import spreadsheet',
+      modalTitle: 'Add your spreadsheet',
+      replaceNotice: 'Importing will replace the current students.',
+      pasteTitle: 'Paste data from your spreadsheet',
+      pastePlaceholder: 'Name\tTypology (optional)',
+      parseButton: 'Load students',
+      fileTitle: 'Open a spreadsheet',
+      fileButton: 'Choose file',
+      fileHint: 'Use a CSV file exported from your spreadsheet.',
+      closeButton: 'Close',
+      downloadButton: 'Download spreadsheet',
+      csvHeader: 'Name;Typology',
+      emptyTable: 'The table is empty. Import or add names to get started.',
+      deleteRow: 'Remove',
+      table: {
+        name: 'Student',
+        typeA: 'Type A',
+        typeB: 'Type B',
+        typeC: 'Type C',
+        actions: 'Actions'
+      },
+      status: {
+        parsed: 'Imported {count} students.',
+        noRows: 'No valid data detected to import.',
+        fileType: 'Please choose a valid CSV file.',
+        fileRead: 'The selected file could not be read.',
+        cleared: 'The student list has been cleared.'
+      }
+    },
+    assignModal: {
+      openButton: 'Assign typologies',
+      helper: 'You can type names in the three typologies or import a spreadsheet and adjust typologies in the window.',
+      title: 'Assign typologies',
+      description: 'Edit the names and pick the right typology for each student. Changes are saved automatically.',
+      closeButton: 'Close'
+    },
     incompatiblesTitle: 'Incompatible people',
     incompatiblesDescription: 'Select several students (Ctrl or Shift + click) to create groups that must not be in the same team.',
     incompatiblesAdd: 'Create incompatible group',
@@ -183,6 +374,7 @@ const TRANSLATIONS = {
     incompatiblesDuplicate: 'A person in this selection already belongs to another incompatible group.',
     infoGroups: 'Teams: {teams} | Leftovers: {leftovers}',
     infoTotals: 'Total: {total} people (A: {countA}, B: {countB}, C: {countC})',
+    groupCount: 'Students: {count}',
     teamLabel: 'Team {index}',
     incompatiblesGroupLabel: 'Group {index}',
     removeIncompatibleAria: 'Remove incompatible group {index}',
@@ -226,6 +418,20 @@ const TRANSLATIONS = {
         randomSize: 'Team {team} has {size} members (target {target}).'
       }
     }
+    ,
+    state: {
+      title: 'Student data',
+      legend: 'Import a previously exported GeCo file (.json) or paste the names on the right. The export includes names, typologies, incompatible groups and teams.',
+      pasteTitle: 'Or paste student names',
+      pastePlaceholder: 'One name per line',
+      pasteButton: 'Load names',
+      pasteHint: 'One name per line. Commas do not split names.',
+      resetButton: 'Reset application',
+      status: {
+        parsed: 'Loaded {count} names.',
+        noRows: 'No names to load.'
+      }
+    }
   },
   gl: {
     languageName: 'GL',
@@ -247,7 +453,55 @@ const TRANSLATIONS = {
     addToOthersLabel: 'Engadir a outros equipos',
     generateButton: 'Xerar equipos',
     copyButton: 'Copiar equipos',
+    exportTeamsButton: 'Exportar equipos a folla de cálculo',
+    topButtons: { exportAll: 'Exportar todo (formato JSON)', importAll: 'Importar ficheiro (exportado en JSON)' },
+    fullImport: {
+      title: 'Importar datos',
+      description: 'Selecciona que datos queres importar. Todo vén marcado por defecto.',
+      fileButton: 'Seleccionar ficheiro',
+      applyButton: 'Importar',
+      cancelButton: 'Cancelar',
+      options: { names: 'Nomes', types: 'Tipoloxía', incompat: 'Incompatibilidades', teams: 'Equipos' },
+      status: { ready: 'Ficheiro cargado. Escolle que importar.', invalid: 'Ficheiro non válido.', readError: 'Non se puido ler o ficheiro.', noData: 'Selecciona un ficheiro válido.', done: 'Importación rematada.' }
+    },
     copySuccess: 'Equipos copiados ao portapapeis',
+    bulkInput: {
+      openButton: 'Importar folla de cálculo',
+      modalTitle: 'Engade a túa folla de cálculo',
+      replaceNotice: 'A importación substitúe o alumnado actual.',
+      pasteTitle: 'Pega datos da túa folla de cálculo',
+      pastePlaceholder: 'Nome\tTipoloxía (opcional)',
+      parseButton: 'Cargar alumnado',
+      fileTitle: 'Abrir unha folla de cálculo',
+      fileButton: 'Seleccionar ficheiro',
+      fileHint: 'Usa un ficheiro CSV exportado desde a túa folla de cálculo.',
+      closeButton: 'Pechar',
+      downloadButton: 'Descargar folla de cálculo',
+      csvHeader: 'Nome;Tipoloxía',
+      emptyTable: 'Non hai alumnado na táboa. Importa ou engade nomes para comezar.',
+      deleteRow: 'Quitar',
+      table: {
+        name: 'Alumno',
+        typeA: 'Tipoloxía A',
+        typeB: 'Tipoloxía B',
+        typeC: 'Tipoloxía C',
+        actions: 'Accións'
+      },
+      status: {
+        parsed: 'Importáronse {count} alumnos.',
+        noRows: 'Non se detectaron datos válidos para importar.',
+        fileType: 'Escolle un ficheiro CSV válido.',
+        fileRead: 'Non se puido ler o ficheiro seleccionado.',
+        cleared: 'A táboa quedou baleira.'
+      }
+    },
+    assignModal: {
+      openButton: 'Asignar tipoloxías',
+      helper: 'Podes escribir nomes nas tres tipoloxías ou importar unha folla de cálculo e axustar as tipoloxías na xanela.',
+      title: 'Asignar tipoloxías',
+      description: 'Edita os nomes e selecciona a tipoloxía axeitada para cada alumno. Os cambios gárdanse automaticamente.',
+      closeButton: 'Pechar'
+    },
     incompatiblesTitle: 'Persoas incompatibles',
     incompatiblesDescription: 'Selecciona varias persoas (Ctrl ou Shift + clic) para crear grupos que non deben coincidir no mesmo equipo.',
     incompatiblesAdd: 'Crear grupo incompatible',
@@ -259,6 +513,7 @@ const TRANSLATIONS = {
     incompatiblesDuplicate: 'Algunha destas persoas xa pertence a outro grupo incompatible.',
     infoGroups: 'Equipos: {teams} | Sobran: {leftovers}',
     infoTotals: 'Total: {total} persoas (A: {countA}, B: {countB}, C: {countC})',
+    groupCount: 'Alumnado: {count}',
     teamLabel: 'Equipo {index}',
     incompatiblesGroupLabel: 'Grupo {index}',
     removeIncompatibleAria: 'Eliminar grupo incompatible {index}',
@@ -302,6 +557,20 @@ const TRANSLATIONS = {
         randomSize: 'O equipo {team} ten {size} membros (obxectivo {target}).'
       }
     }
+    ,
+    state: {
+      title: 'Datos do alumnado',
+      legend: 'Importa un ficheiro de exportación de GeCo (.json) ou pega os nomes na caixa da dereita. Gardaranse nomes, tipoloxías, grupos incompatibles e equipos.',
+      pasteTitle: 'Ou pegar nomes do alumnado',
+      pastePlaceholder: 'Un nome por liña',
+      pasteButton: 'Cargar nomes',
+      pasteHint: 'Un nome por liña. As comas non separan.',
+      resetButton: 'Reiniciar aplicación',
+      status: {
+        parsed: 'Cargáronse {count} nomes.',
+        noRows: 'Non hai nomes para cargar.'
+      }
+    }
   },
   eu: {
     languageName: 'EU',
@@ -323,7 +592,55 @@ const TRANSLATIONS = {
     addToOthersLabel: 'Gainerako taldeen artean banatu',
     generateButton: 'Taldeak sortu',
     copyButton: 'Taldeak kopiatu',
+    exportTeamsButton: 'Taldeak kalkulu-orritara esportatu',
+    topButtons: { exportAll: 'Dena esportatu (JSON)', importAll: 'JSON gisa esportatutako fitxategia inportatu' },
+    fullImport: {
+      title: 'Datuak inportatu',
+      description: 'Aukeratu zein datu inportatu nahi dituzun. Lehenespenez dena markatuta dago.',
+      fileButton: 'Aukeratu fitxategia',
+      applyButton: 'Inportatu',
+      cancelButton: 'Utzi',
+      options: { names: 'Izenak', types: 'Tipologia', incompat: 'Bateraezintasunak', teams: 'Taldeak' },
+      status: { ready: 'Fitxategia kargatuta. Aukeratu zer inportatu.', invalid: 'Fitxategi baliogabea.', readError: 'Ezin izan da fitxategia irakurri.', noData: 'Aukeratu fitxategi baliodun bat lehenik.', done: 'Inportazioa amaituta.' }
+    },
     copySuccess: 'Taldeak arbelean kopiatu dira',
+    bulkInput: {
+      openButton: 'Kargatu kalkulu-orria',
+      modalTitle: 'Gehitu zure kalkulu-orria',
+      replaceNotice: 'Inportazioak uneko ikasle guztiak ordezkatuko ditu.',
+      pasteTitle: 'Itsatsi datuak kalkulu-orritik',
+      pastePlaceholder: 'Izena\tTipologia (aukerakoa)',
+      parseButton: 'Ikasleak kargatu',
+      fileTitle: 'Ireki kalkulu-orri bat',
+      fileButton: 'Aukeratu fitxategia',
+      fileHint: 'Erabili kalkulu-orritik esportatutako CSV fitxategia.',
+      closeButton: 'Itxi',
+      downloadButton: 'Deskargatu kalkulu-orria',
+      csvHeader: 'Izena;Tipologia',
+      emptyTable: 'Taula hutsik dago. Inportatu edo gehitu izenak hasteko.',
+      deleteRow: 'Kendu',
+      table: {
+        name: 'Ikaslea',
+        typeA: 'A tipologia',
+        typeB: 'B tipologia',
+        typeC: 'C tipologia',
+        actions: 'Ekintzak'
+      },
+      status: {
+        parsed: '{count} ikasle inportatu dira.',
+        noRows: 'Ez da datu baliagarririk aurkitu inportatzeko.',
+        fileType: 'Aukeratu baliozko CSV fitxategi bat.',
+        fileRead: 'Ezin izan da aukeratutako fitxategia irakurri.',
+        cleared: 'Ikasleen zerrenda garbitu da.'
+      }
+    },
+    assignModal: {
+      openButton: 'Tipologiak esleitu',
+      helper: 'Hiru tipologietan izenak idatz ditzakezu edo kalkulu-orria inportatu eta leihoan tipologiak doitu.',
+      title: 'Tipologiak esleitu',
+      description: 'Editatu izenak eta aukeratu ikasle bakoitzarentzako tipologia egokia. Aldaketak automatikoki gordetzen dira.',
+      closeButton: 'Itxi'
+    },
     incompatiblesTitle: 'Bateraezinak',
     incompatiblesDescription: 'Hautatu hainbat pertsona (Ctrl edo Shift + klik) talde berean egon ez daitezen.',
     incompatiblesAdd: 'Sortu bateraezinen taldea',
@@ -335,6 +652,7 @@ const TRANSLATIONS = {
     incompatiblesDuplicate: 'Pertsona hauetako batek dagoeneko beste bateraezin talde batean parte hartzen du.',
     infoGroups: 'Taldeak: {teams} | Soberan: {leftovers}',
     infoTotals: 'Guztira: {total} pertsona (A: {countA}, B: {countB}, C: {countC})',
+    groupCount: 'Ikasleak: {count}',
     teamLabel: 'Taldea {index}',
     incompatiblesGroupLabel: 'Talde {index}',
     removeIncompatibleAria: 'Ezabatu bateraezinen taldea {index}',
@@ -376,6 +694,20 @@ const TRANSLATIONS = {
         homoMixed: 'Talde {team} tipologia desberdinak nahasten ditu: {types}.',
         incompatibles: 'Bateraezinak diren {names} pertsonak talde {team} berean bukatu dute.',
         randomSize: 'Talde {team}k {size} kide ditu (helburua {target}).'
+      }
+    }
+    ,
+    state: {
+      title: 'Ikasleen datuak',
+      legend: 'GeCo-tik esportatutako fitxategi bat (.json) inportatu edo eskuineko koadroan izenak itsatsi. Gordetzen dira: izenak, tipologiak, bateraezinak eta taldeak.',
+      pasteTitle: 'Edo itsatsi ikasleen izenak',
+      pastePlaceholder: 'Izen bat lerroko',
+      pasteButton: 'Izenak kargatu',
+      pasteHint: 'Izen bat lerroko. Komek ez dute banatzen.',
+      resetButton: 'Aplikazioa berrezarri',
+      status: {
+        parsed: '{count} izen kargatu dira.',
+        noRows: 'Ez dago kargatzeko izenik.'
       }
     }
   }

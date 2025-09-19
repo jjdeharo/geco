@@ -2,6 +2,16 @@ const DEFAULT_LANGUAGE = 'es';
 let currentLanguage = DEFAULT_LANGUAGE;
 let incompatibleGroups = [];
 let lastReportData = null;
+let studentAssignments = [];
+const STUDENT_TYPES = ['A', 'B', 'C'];
+let lastFocusedElement = null;
+let isTypologyModalOpen = false;
+let isImportModalOpen = false;
+let lastFocusedImportElement = null;
+let isFullImportModalOpen = false;
+let fullImportSelectedData = null;
+const STORAGE_KEY = 'gecoStateV1';
+
 
 const SAMPLE_NAMES = {
   es: {
@@ -43,7 +53,7 @@ function getSampleList(lang, groupKey) {
 
 function formatSampleNames(lang, groupKey) {
   const list = getSampleList(lang, groupKey);
-  return list ? list.join(', ') : '';
+  return list ? list.join('\n') : '';
 }
 
 function getSampleSignature(lang, groupKey) {
@@ -113,6 +123,10 @@ function applyTranslations() {
       el.textContent = value;
     }
   });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    el.setAttribute('placeholder', t(key));
+  });
 }
 
 function buildLanguageSwitcher() {
@@ -169,10 +183,812 @@ function detectBrowserLanguage() {
 }
 
 function parseNames(value) {
-  return value
-    .split(/[\n,]+/)
-    .map(item => item.trim())
+  return (value || '')
+    .split(/\r?\n/)
+    .map(item => item.replace(/^["']|["']$/g, '').trim())
     .filter(item => item.length > 0);
+}
+
+function normaliseStudentType(value) {
+  const token = (value || '').toString().trim().toUpperCase();
+  if (token === 'A' || token === 'B' || token === 'C') {
+    return token;
+  }
+  if (token.startsWith('A')) {
+    return 'A';
+  }
+  if (token.startsWith('C')) {
+    return 'C';
+  }
+  if (token.startsWith('B')) {
+    return 'B';
+  }
+  return 'B';
+}
+
+function normaliseAssignments(assignments) {
+  const locale = getCurrentLocale();
+  const map = new Map();
+  assignments.forEach(student => {
+    if (!student) return;
+    const name = (student.nombre || '').trim();
+    if (!name) return;
+    const key = name.toLowerCase();
+    map.set(key, { nombre: name, tipo: normaliseStudentType(student.tipo) });
+  });
+  return Array.from(map.values()).sort((a, b) => a.nombre.localeCompare(b.nombre, locale, { sensitivity: 'base' }));
+}
+
+function showImportStatus(key, params = {}, status = 'info') {
+  const statusEl = document.getElementById('importStatus');
+  if (!statusEl) {
+    return;
+  }
+  if (!key) {
+    statusEl.textContent = '';
+    statusEl.classList.remove('success', 'error');
+    return;
+  }
+  statusEl.textContent = t(key, params);
+  statusEl.classList.remove('success', 'error');
+  if (status === 'success') {
+    statusEl.classList.add('success');
+  } else if (status === 'error') {
+    statusEl.classList.add('error');
+  }
+}
+
+function showFullImportStatus(message, type = 'info') {
+  const el = document.getElementById('fullImportStatus');
+  if (!el) return;
+  el.textContent = message || '';
+  el.classList.remove('success', 'error');
+  if (type === 'success') el.classList.add('success');
+  if (type === 'error') el.classList.add('error');
+}
+
+function saveAppState() {
+  try {
+    const payload = {
+      version: 1,
+      data: {
+        students: studentAssignments || [],
+        incompatibleGroups: incompatibleGroups || [],
+        teams: lastReportData?.equipos || null,
+        tipoGrupo: lastReportData?.tipoGrupo || getCurrentTipoGrupo(),
+        numAlumnos: getCurrentNumAlumnos(),
+        opcionSobrantes: getCurrentSobrantes()
+      }
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch (e) { /* ignore */ }
+}
+
+function loadAppState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    const data = parsed && parsed.data ? parsed.data : parsed; // admite export antiguo
+    if (!data) return false;
+    const students = Array.isArray(data.students) ? data.students : [];
+    if (students.length > 0) {
+      replaceStudentAssignments(students);
+    }
+    if (Array.isArray(data.incompatibleGroups)) {
+      const nameSet = new Set((studentAssignments || []).map(s => s.nombre));
+      incompatibleGroups = data.incompatibleGroups
+        .map(g => g.filter(n => nameSet.has(n)))
+        .filter(g => g.length >= 2);
+      refreshIncompatiblesUI();
+    }
+    // Sincronizar controles del UI con preferencias guardadas
+    const tipoGrupo = data.tipoGrupo || getCurrentTipoGrupo();
+    const numAlumnos = typeof data.numAlumnos === 'number' ? data.numAlumnos : getCurrentNumAlumnos();
+    const opcionSobrantes = data.opcionSobrantes || getCurrentSobrantes();
+    // Radios tipoGrupo
+    const tipoRadio = document.querySelector(`input[name="tipoGrupo"][value="${tipoGrupo}"]`);
+    if (tipoRadio) tipoRadio.checked = true;
+    // Burbujas número y hidden input
+    const hiddenInput = document.getElementById('numAlumnos');
+    if (hiddenInput) hiddenInput.value = String(numAlumnos);
+    document.querySelectorAll('.bubble').forEach(b => {
+      const val = b.getAttribute('data-value');
+      if (val === String(numAlumnos)) b.classList.add('active'); else b.classList.remove('active');
+    });
+    // Radios sobrantes
+    const sobRadio = document.querySelector(`input[name="sobrantes"][value="${opcionSobrantes}"]`);
+    if (sobRadio) sobRadio.checked = true;
+    if (Array.isArray(data.teams) && data.teams.length > 0) {
+      const equipos = data.teams.map(grupo => grupo.map(al => ({ nombre: al.nombre, tipo: al.tipo })));
+      mostrarEquipos(equipos);
+      lastReportData = {
+        equipos: cloneEquipos(equipos),
+        tipoGrupo,
+        numAlumnos,
+        opcionSobrantes
+      };
+      mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes);
+    }
+    return true;
+  } catch (e) { return false; }
+}
+
+function showQuickPasteStatus(messageKey, params = {}, type = 'info') {
+  const el = document.getElementById('quickPasteStatus');
+  if (!el) return;
+  if (!messageKey) {
+    el.textContent = '';
+    el.classList.remove('success', 'error');
+    return;
+  }
+  el.textContent = t(messageKey, params);
+  el.classList.remove('success', 'error');
+  if (type === 'success') el.classList.add('success');
+  if (type === 'error') el.classList.add('error');
+}
+
+function refreshBodyModalState() {
+  if (isTypologyModalOpen || isImportModalOpen) {
+    document.body.classList.add('modal-open');
+  } else {
+    document.body.classList.remove('modal-open');
+  }
+}
+
+function renderAssignmentsTable() {
+  const container = document.getElementById('bulkTableContainer');
+  if (!container) {
+    return;
+  }
+  container.innerHTML = '';
+  if (!studentAssignments || studentAssignments.length === 0) {
+    const emptyMsg = document.createElement('p');
+    emptyMsg.textContent = t('bulkInput.emptyTable');
+    container.appendChild(emptyMsg);
+    return;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'bulk-table';
+
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  const headers = [
+    { key: 'bulkInput.table.name', className: '' },
+    { key: 'bulkInput.table.typeA', className: 'type-column' },
+    { key: 'bulkInput.table.typeB', className: 'type-column' },
+    { key: 'bulkInput.table.typeC', className: 'type-column' },
+    { key: 'bulkInput.table.actions', className: '' }
+  ];
+  headers.forEach(({ key, className }) => {
+    const th = document.createElement('th');
+    th.textContent = t(key);
+    if (className) {
+      th.className = className;
+    }
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  studentAssignments.forEach((student, index) => {
+    const row = document.createElement('tr');
+
+    const nameCell = document.createElement('td');
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = student.nombre;
+    nameInput.addEventListener('change', event => handleAssignmentNameChange(index, event.target.value));
+    nameCell.appendChild(nameInput);
+    row.appendChild(nameCell);
+
+    STUDENT_TYPES.forEach(tipo => {
+      const typeCell = document.createElement('td');
+      typeCell.className = 'type-column';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'type-toggle';
+      if (student.tipo === tipo) {
+        button.classList.add('selected');
+        button.textContent = 'X';
+      } else {
+        button.textContent = '•';
+      }
+      button.addEventListener('click', () => handleAssignmentTypeClick(index, tipo));
+      typeCell.appendChild(button);
+      row.appendChild(typeCell);
+    });
+
+    const actionCell = document.createElement('td');
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'row-delete';
+    deleteBtn.textContent = t('bulkInput.deleteRow');
+    deleteBtn.addEventListener('click', () => handleAssignmentDelete(index));
+    actionCell.appendChild(deleteBtn);
+    row.appendChild(actionCell);
+
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+function focusFirstTypologyField() {
+  const modal = document.getElementById('typologyModal');
+  if (!modal) {
+    return;
+  }
+  const firstEditable = modal.querySelector('.modal-body input, .modal-body select');
+  if (firstEditable) {
+    firstEditable.focus();
+    return;
+  }
+  const closeBtn = document.getElementById('typologyModalClose');
+  if (closeBtn) {
+    closeBtn.focus();
+  }
+}
+
+function handleTypologyModalKeydown(event) {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeTypologyModal();
+  }
+}
+
+function openTypologyModal() {
+  const modal = document.getElementById('typologyModal');
+  if (!modal || isTypologyModalOpen) {
+    return;
+  }
+  lastFocusedElement = document.activeElement;
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+  isTypologyModalOpen = true;
+  renderAssignmentsTable();
+  focusFirstTypologyField();
+  document.addEventListener('keydown', handleTypologyModalKeydown);
+  refreshBodyModalState();
+}
+
+function closeTypologyModal() {
+  const modal = document.getElementById('typologyModal');
+  if (!modal || !isTypologyModalOpen) {
+    return;
+  }
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden', 'true');
+  isTypologyModalOpen = false;
+  document.removeEventListener('keydown', handleTypologyModalKeydown);
+  refreshBodyModalState();
+  if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+    lastFocusedElement.focus();
+  }
+  lastFocusedElement = null;
+}
+
+function initTypologyModal() {
+  const openBtn = document.getElementById('openTypologyModal');
+  if (openBtn) {
+    openBtn.addEventListener('click', openTypologyModal);
+  }
+  const closeBtn = document.getElementById('typologyModalClose');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeTypologyModal);
+  }
+  const doneBtn = document.getElementById('typologyModalDone');
+  if (doneBtn) {
+    doneBtn.addEventListener('click', closeTypologyModal);
+  }
+  const downloadBtn = document.getElementById('downloadAssignmentsBtn');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', downloadAssignmentsAsCsv);
+  }
+  const modal = document.getElementById('typologyModal');
+  if (modal) {
+    modal.addEventListener('click', event => {
+      if (event.target === modal) {
+        closeTypologyModal();
+      }
+    });
+  }
+}
+
+function handleAssignmentNameChange(index, value) {
+  if (!studentAssignments[index]) {
+    return;
+  }
+  studentAssignments[index].nombre = value;
+  studentAssignments = normaliseAssignments(studentAssignments);
+  syncTextareasFromAssignments();
+  renderAssignmentsTable();
+  saveAppState();
+}
+
+function handleAssignmentTypeClick(index, tipo) {
+  if (!studentAssignments[index]) {
+    return;
+  }
+  studentAssignments[index].tipo = normaliseStudentType(tipo);
+  studentAssignments = normaliseAssignments(studentAssignments);
+  syncTextareasFromAssignments();
+  renderAssignmentsTable();
+  saveAppState();
+}
+
+function handleAssignmentDelete(index) {
+  if (index < 0 || index >= studentAssignments.length) {
+    return;
+  }
+  studentAssignments.splice(index, 1);
+  studentAssignments = normaliseAssignments(studentAssignments);
+  syncTextareasFromAssignments();
+  renderAssignmentsTable();
+  saveAppState();
+}
+
+function syncTextareasFromAssignments() {
+  const locale = getCurrentLocale();
+  const grouped = { A: [], B: [], C: [] };
+  studentAssignments.forEach(student => {
+    if (!grouped[student.tipo]) {
+      grouped[student.tipo] = [];
+    }
+    grouped[student.tipo].push(student.nombre);
+  });
+  STUDENT_TYPES.forEach(tipo => {
+    const textarea = document.getElementById('grupo' + tipo);
+    if (!textarea) {
+      return;
+    }
+    const names = grouped[tipo] || [];
+    names.sort((a, b) => a.localeCompare(b, locale, { sensitivity: 'base' }));
+    textarea.value = names.join('\n');
+    delete textarea.dataset.sampleLang;
+  });
+  updateInfoGrupos();
+  saveAppState();
+}
+
+function updateAssignmentsFromTextareas(options = {}) {
+  const { renderTable = true } = options;
+  const { grupoA, grupoB, grupoC } = getStudentLists();
+  const merged = [
+    ...grupoA.map(nombre => ({ nombre, tipo: 'A' })),
+    ...grupoB.map(nombre => ({ nombre, tipo: 'B' })),
+    ...grupoC.map(nombre => ({ nombre, tipo: 'C' }))
+  ];
+  studentAssignments = normaliseAssignments(merged);
+  if (renderTable) {
+    renderAssignmentsTable();
+  }
+}
+
+function parseBulkInput(rawText) {
+  return rawText
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .map(line => {
+      const cleaned = line.replace(/"/g, '');
+      // Solo tabulador o punto y coma como separador de columnas; la coma puede formar parte del nombre
+      const parts = cleaned.split(/\t|;/);
+      const name = (parts[0] || '').trim();
+      if (!name) {
+        return null;
+      }
+      const typeValue = parts.length > 1 ? parts[1].trim() : '';
+      return { nombre: name, tipo: typeValue };
+    })
+    .filter(Boolean);
+}
+
+function replaceStudentAssignments(assignments) {
+  studentAssignments = normaliseAssignments(assignments);
+  syncTextareasFromAssignments();
+  incompatibleGroups = [];
+  refreshIncompatiblesUI();
+  renderAssignmentsTable();
+  const resultadosDiv = document.getElementById('resultados');
+  if (resultadosDiv) {
+    resultadosDiv.innerHTML = '';
+  }
+  const reportDiv = document.getElementById('report');
+  if (reportDiv) {
+    reportDiv.innerHTML = '';
+  }
+  const successMsg = document.getElementById('copySuccess');
+  if (successMsg) {
+    successMsg.textContent = '';
+    successMsg.classList.remove('show');
+  }
+  lastReportData = null;
+  mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
+  saveAppState();
+}
+
+function addStudentsFromBulk(rawText) {
+  const text = (rawText || '').trim();
+  if (!text) {
+    showImportStatus('bulkInput.status.noRows', {}, 'error');
+    return null;
+  }
+  const parsed = parseBulkInput(text);
+  if (!parsed || parsed.length === 0) {
+    showImportStatus('bulkInput.status.noRows', {}, 'error');
+    return null;
+  }
+  const uniqueKeys = new Set();
+  parsed.forEach(item => {
+    const key = (item.nombre || '').trim().toLowerCase();
+    if (key) {
+      uniqueKeys.add(key);
+    }
+  });
+  replaceStudentAssignments(parsed);
+  return uniqueKeys.size;
+}
+
+function triggerImportFileSelection() {
+  const input = document.getElementById('importFileInput');
+  if (input) {
+    input.value = '';
+    input.click();
+  }
+}
+
+function handleImportFileChange(event) {
+  const file = event.target?.files?.[0];
+  if (!file) {
+    return;
+  }
+  const name = file.name ? file.name.toLowerCase() : '';
+  const isCsv = name.endsWith('.csv');
+  if (!isCsv && file.type && !file.type.includes('csv') && !file.type.includes('text')) {
+    showImportStatus('bulkInput.status.fileType', {}, 'error');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = event => {
+    const content = event.target?.result;
+    const count = addStudentsFromBulk(typeof content === 'string' ? content : '');
+    if (count !== null) {
+      closeImportModal();
+      openTypologyModal();
+    }
+  };
+  reader.onerror = () => {
+    showImportStatus('bulkInput.status.fileRead', {}, 'error');
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function openImportModal() {
+  const modal = document.getElementById('importModal');
+  if (!modal || isImportModalOpen) {
+    return;
+  }
+  lastFocusedImportElement = document.activeElement;
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+  isImportModalOpen = true;
+  showImportStatus(null);
+  const textarea = document.getElementById('importTextarea');
+  if (textarea) {
+    textarea.value = '';
+    textarea.focus();
+  }
+  const fileInput = document.getElementById('importFileInput');
+  if (fileInput) {
+    fileInput.value = '';
+  }
+  document.addEventListener('keydown', handleImportModalKeydown);
+  refreshBodyModalState();
+}
+
+function buildExportPayload() {
+  const students = studentAssignments && studentAssignments.length > 0
+    ? studentAssignments
+    : (() => {
+        const { grupoA, grupoB, grupoC } = getStudentLists();
+        return normaliseAssignments([
+          ...grupoA.map(nombre => ({ nombre, tipo: 'A' })),
+          ...grupoB.map(nombre => ({ nombre, tipo: 'B' })),
+          ...grupoC.map(nombre => ({ nombre, tipo: 'C' }))
+        ]);
+      })();
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    data: {
+      students,
+      incompatibleGroups,
+      teams: lastReportData?.equipos || null
+    }
+  };
+  return data;
+}
+
+function exportAllData() {
+  const payload = buildExportPayload();
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  const now = new Date();
+  const date = now.toISOString().slice(0, 10);
+  const time = now.toTimeString().slice(0,8).replace(/:/g, '-');
+  link.download = `geco-export-${date}_${time}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function openFullImportModal() {
+  const modal = document.getElementById('fullImportModal');
+  if (!modal || isFullImportModalOpen) return;
+  fullImportSelectedData = null;
+  lastFocusedElement = document.activeElement;
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+  isFullImportModalOpen = true;
+  showFullImportStatus('');
+  document.addEventListener('keydown', handleFullImportModalKeydown);
+  refreshBodyModalState();
+}
+
+function closeFullImportModal() {
+  const modal = document.getElementById('fullImportModal');
+  if (!modal || !isFullImportModalOpen) return;
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden', 'true');
+  isFullImportModalOpen = false;
+  document.removeEventListener('keydown', handleFullImportModalKeydown);
+  refreshBodyModalState();
+  if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+    lastFocusedElement.focus();
+  }
+  lastFocusedElement = null;
+}
+
+function handleFullImportModalKeydown(event) {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeFullImportModal();
+  }
+}
+
+function triggerFullImportFileSelection() {
+  const input = document.getElementById('fullImportFileInput');
+  if (input) { input.value = ''; input.click(); }
+}
+
+function handleFullImportFileChange(event) {
+  const file = event.target?.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const content = e.target?.result;
+      const parsed = JSON.parse(typeof content === 'string' ? content : '{}');
+      if (!parsed || !parsed.data) throw new Error('Invalid file');
+      fullImportSelectedData = parsed.data;
+      showFullImportStatus(t('fullImport.status.ready') || 'Archivo cargado. Elige qué importar.', 'success');
+    } catch (err) {
+      showFullImportStatus(t('fullImport.status.invalid') || 'Archivo no válido.', 'error');
+      fullImportSelectedData = null;
+    }
+  };
+  reader.onerror = () => showFullImportStatus(t('fullImport.status.readError') || 'No se pudo leer el archivo.', 'error');
+  reader.readAsText(file, 'UTF-8');
+}
+
+function applyFullImport() {
+  if (!fullImportSelectedData) {
+    showFullImportStatus(t('fullImport.status.noData') || 'Primero selecciona un archivo válido.', 'error');
+    return;
+  }
+  const withNames = document.getElementById('importNamesChk')?.checked;
+  const withTypes = document.getElementById('importTypesChk')?.checked;
+  const withIncompat = document.getElementById('importIncompatChk')?.checked;
+  const withTeams = document.getElementById('importTeamsChk')?.checked;
+
+  const incomingStudents = Array.isArray(fullImportSelectedData.students) ? fullImportSelectedData.students : [];
+  const incomingIncompat = Array.isArray(fullImportSelectedData.incompatibleGroups) ? fullImportSelectedData.incompatibleGroups : [];
+  const incomingTeams = Array.isArray(fullImportSelectedData.teams) ? fullImportSelectedData.teams : null;
+
+  // Import students
+  if (withNames || withTypes) {
+    if (withNames && withTypes) {
+      replaceStudentAssignments(incomingStudents);
+    } else if (withNames && !withTypes) {
+      // Añadir/actualizar nombres manteniendo tipo actual o B por defecto.
+      const current = new Map((studentAssignments || []).map(s => [s.nombre.toLowerCase(), s]));
+      incomingStudents.forEach(s => {
+        const key = (s.nombre || '').toLowerCase();
+        if (!key) return;
+        if (current.has(key)) {
+          // mantener su tipo actual
+          const cur = current.get(key);
+          cur.nombre = s.nombre; // normaliza mayúsculas
+        } else {
+          current.set(key, { nombre: s.nombre, tipo: 'B' });
+        }
+      });
+      studentAssignments = normaliseAssignments(Array.from(current.values()));
+      syncTextareasFromAssignments();
+      renderAssignmentsTable();
+    } else if (!withNames && withTypes) {
+      // Actualiza tipos para nombres existentes; ignora desconocidos
+      const current = new Map((studentAssignments || []).map(s => [s.nombre.toLowerCase(), s]));
+      incomingStudents.forEach(s => {
+        const key = (s.nombre || '').toLowerCase();
+        if (current.has(key)) {
+          current.get(key).tipo = normaliseStudentType(s.tipo);
+        }
+      });
+      studentAssignments = normaliseAssignments(Array.from(current.values()));
+      syncTextareasFromAssignments();
+      renderAssignmentsTable();
+    }
+  }
+
+  // Import incompatibles
+  if (withIncompat) {
+    const nameSet = new Set((studentAssignments || []).map(s => s.nombre));
+    incompatibleGroups = incomingIncompat
+      .map(group => group.filter(n => nameSet.has(n)))
+      .filter(group => group.length >= 2);
+    refreshIncompatiblesUI();
+  }
+
+  // Import teams
+  if (withTeams && incomingTeams) {
+    mostrarEquipos(incomingTeams);
+    const tipoGrupo = getCurrentTipoGrupo();
+    const numAlumnos = getCurrentNumAlumnos();
+    const opcionSobrantes = getCurrentSobrantes();
+    lastReportData = {
+      equipos: cloneEquipos(incomingTeams),
+      tipoGrupo,
+      numAlumnos,
+      opcionSobrantes
+    };
+    mostrarInforme(incomingTeams, tipoGrupo, numAlumnos, opcionSobrantes);
+  }
+
+  showFullImportStatus(t('fullImport.status.done') || 'Importación finalizada.', 'success');
+  closeFullImportModal();
+  saveAppState();
+}
+
+function closeImportModal() {
+  const modal = document.getElementById('importModal');
+  if (!modal || !isImportModalOpen) {
+    return;
+  }
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden', 'true');
+  isImportModalOpen = false;
+  document.removeEventListener('keydown', handleImportModalKeydown);
+  refreshBodyModalState();
+  if (lastFocusedImportElement && typeof lastFocusedImportElement.focus === 'function') {
+    lastFocusedImportElement.focus();
+  }
+  lastFocusedImportElement = null;
+}
+
+function handleImportModalKeydown(event) {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeImportModal();
+  }
+}
+
+function initImportModal() {
+  const openBtn = document.getElementById('openImportModal');
+  if (openBtn) {
+    openBtn.addEventListener('click', openImportModal);
+  }
+  const closeBtn = document.getElementById('importModalClose');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeImportModal);
+  }
+  const doneBtn = document.getElementById('importModalDone');
+  if (doneBtn) {
+    doneBtn.addEventListener('click', closeImportModal);
+  }
+  const modal = document.getElementById('importModal');
+  if (modal) {
+    modal.addEventListener('click', event => {
+      if (event.target === modal) {
+        closeImportModal();
+      }
+    });
+  }
+  const pasteBtn = document.getElementById('importPasteBtn');
+  if (pasteBtn) {
+    pasteBtn.addEventListener('click', () => {
+      const textarea = document.getElementById('importTextarea');
+      const value = textarea ? textarea.value : '';
+      const count = addStudentsFromBulk(value);
+      if (count !== null) {
+        if (textarea) {
+          textarea.value = '';
+        }
+        closeImportModal();
+        openTypologyModal();
+      }
+    });
+  }
+  const fileBtn = document.getElementById('importFileBtn');
+  if (fileBtn) {
+    fileBtn.addEventListener('click', triggerImportFileSelection);
+  }
+  const fileInput = document.getElementById('importFileInput');
+  if (fileInput) {
+    fileInput.addEventListener('change', handleImportFileChange);
+  }
+}
+
+function initFullImport() {
+  const openBtn = document.getElementById('openFullImportBtn');
+  if (openBtn) openBtn.addEventListener('click', openFullImportModal);
+  const closeBtn = document.getElementById('fullImportClose');
+  if (closeBtn) closeBtn.addEventListener('click', closeFullImportModal);
+  const cancelBtn = document.getElementById('fullImportCancel');
+  if (cancelBtn) cancelBtn.addEventListener('click', closeFullImportModal);
+  const fileBtn = document.getElementById('fullImportFileBtn');
+  if (fileBtn) fileBtn.addEventListener('click', triggerFullImportFileSelection);
+  const fileInput = document.getElementById('fullImportFileInput');
+  if (fileInput) fileInput.addEventListener('change', handleFullImportFileChange);
+  const applyBtn = document.getElementById('fullImportApply');
+  if (applyBtn) applyBtn.addEventListener('click', applyFullImport);
+}
+
+function addStudentsFromNamesOnly(rawText) {
+  const text = (rawText || '').trim();
+  if (!text) {
+    showQuickPasteStatus('state.status.noRows', {}, 'error');
+    return null;
+  }
+  // Solo separa por líneas; ignora comas dentro de una misma línea
+  const lines = text.split(/\r?\n/).map(l => l.replace(/^"|"$/g, '').trim());
+  const unique = Array.from(new Set(lines.filter(Boolean)));
+  if (unique.length === 0) {
+    showQuickPasteStatus('state.status.noRows', {}, 'error');
+    return null;
+  }
+  const assignments = unique.map(nombre => ({ nombre, tipo: 'B' }));
+  replaceStudentAssignments(assignments);
+  showQuickPasteStatus('state.status.parsed', { count: unique.length }, 'success');
+  return unique.length;
+}
+
+function downloadAssignmentsAsCsv() {
+  if (!studentAssignments || studentAssignments.length === 0) {
+    alert(t('bulkInput.status.noRows'));
+    return;
+  }
+  const header = t('bulkInput.csvHeader') || 'Nombre;Tipología';
+  const lines = studentAssignments.map(student => `${student.nombre};${student.tipo}`);
+  const csvContent = [header, ...lines].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  const date = new Date().toISOString().slice(0, 10);
+  link.download = `alumnado-${date}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 function getStudentLists() {
@@ -325,16 +1141,19 @@ function addIncompatibleGroup() {
     option.selected = false;
   });
   refreshIncompatiblesUI();
+  saveAppState();
 }
 
 function removeIncompatibleGroup(index) {
   incompatibleGroups.splice(index, 1);
   refreshIncompatiblesUI();
+  saveAppState();
 }
 
 function clearIncompatibleGroups() {
   incompatibleGroups = [];
   refreshIncompatiblesUI();
+  saveAppState();
 }
 
 function setupSampleNamesMetadata() {
@@ -389,6 +1208,7 @@ function handleNamesInput(event) {
   }
   updateInfoGrupos();
   refreshIncompatiblesUI();
+  updateAssignmentsFromTextareas();
 }
 
 function setLanguage(lang) {
@@ -402,8 +1222,15 @@ function setLanguage(lang) {
   applyTranslations();
   buildLanguageSwitcher();
   applySampleNamesForLanguage(currentLanguage, previousLanguage);
+  updateAssignmentsFromTextareas({ renderTable: false });
   updateInfoGrupos();
   refreshIncompatiblesUI();
+  studentAssignments = normaliseAssignments(studentAssignments);
+  renderAssignmentsTable();
+  showImportStatus(null);
+  if (isTypologyModalOpen) {
+    focusFirstTypologyField();
+  }
   if (lastReportData) {
     const { equipos, tipoGrupo, numAlumnos, opcionSobrantes } = lastReportData;
     mostrarInforme(cloneEquipos(equipos), tipoGrupo, numAlumnos, opcionSobrantes);
@@ -419,6 +1246,9 @@ function clearAllNames() {
     textarea.value = '';
     delete textarea.dataset.sampleLang;
   });
+  studentAssignments = [];
+  renderAssignmentsTable();
+  showImportStatus('bulkInput.status.cleared', {}, 'success');
   clearIncompatibleGroups();
   updateInfoGrupos();
   const successMsg = document.getElementById('copySuccess');
@@ -446,6 +1276,12 @@ function updateInfoGrupos() {
     countB: grupoB.length,
     countC: grupoC.length
   });
+  const countAEl = document.getElementById('countA');
+  const countBEl = document.getElementById('countB');
+  const countCEl = document.getElementById('countC');
+  if (countAEl) countAEl.textContent = t('groupCount', { count: grupoA.length });
+  if (countBEl) countBEl.textContent = t('groupCount', { count: grupoB.length });
+  if (countCEl) countCEl.textContent = t('groupCount', { count: grupoC.length });
   syncIncompatibleGroupsWithStudents();
   const leftoversOption = getCurrentSobrantes();
   updateIncompatiblesInfo(totalAlumnos, numAlumnos, leftoversOption);
@@ -488,6 +1324,7 @@ function initNumberSelector() {
       hiddenInput.value = bubble.getAttribute('data-value');
       updateInfoGrupos();
       refreshIncompatiblesUI();
+      saveAppState();
     });
   });
 }
@@ -836,6 +1673,7 @@ function generarYMostrarEquipos() {
     opcionSobrantes
   };
   mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes);
+  saveAppState();
 }
 
 function mostrarEquipos(equipos) {
@@ -863,12 +1701,27 @@ function mostrarEquipos(equipos) {
     cellMiembros.textContent = miembrosTexto;
   });
   resultadosDiv.appendChild(table);
+  const actions = document.createElement('div');
+  actions.className = 'result-actions';
+  const exportAllButton = document.createElement('button');
+  exportAllButton.id = 'exportAllBtnResults';
+  exportAllButton.className = 'btn';
+  exportAllButton.textContent = t('topButtons.exportAll');
+  exportAllButton.addEventListener('click', exportAllData);
   const copyButton = document.createElement('button');
   copyButton.id = 'copiarEquipos';
   copyButton.className = 'btn';
   copyButton.textContent = t('copyButton');
-  resultadosDiv.appendChild(copyButton);
   copyButton.addEventListener('click', () => copiarEquipos(equipos));
+  const exportButton = document.createElement('button');
+  exportButton.id = 'exportTeamsCsv';
+  exportButton.className = 'btn';
+  exportButton.textContent = t('exportTeamsButton');
+  exportButton.addEventListener('click', () => downloadTeamsAsCsv(equipos));
+  actions.appendChild(exportAllButton);
+  actions.appendChild(exportButton);
+  actions.appendChild(copyButton);
+  resultadosDiv.appendChild(actions);
 }
 
 function copiarEquipos(equipos) {
@@ -890,6 +1743,47 @@ function copiarEquipos(equipos) {
       successMsg.classList.remove('show');
     }, 3000);
   });
+}
+
+function csvEscape(value) {
+  const s = (value === null || value === undefined) ? '' : String(value);
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+
+function downloadTeamsAsCsv(equipos) {
+  if (!equipos || equipos.length === 0) {
+    alert(t('bulkInput.status.noRows'));
+    return;
+  }
+  // Formato apilado por equipos:
+  // Col A: "Equipo X" (solo en la primera fila del bloque)
+  // Col B: Nombre
+  // Col C: Tipología
+  // Fila en blanco entre equipos
+  const rows = [];
+  equipos.forEach((grupo, index) => {
+    const teamLabel = t('teamLabel', { index: index + 1 });
+    grupo.forEach((alumno, i) => {
+      const colA = i === 0 ? teamLabel : '';
+      rows.push([csvEscape(colA), csvEscape(alumno.nombre), csvEscape(alumno.tipo)].join(';'));
+    });
+    if (index < equipos.length - 1) {
+      rows.push('"";"";""');
+    }
+  });
+  const csvContent = rows.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  const now = new Date();
+  const date = now.toISOString().slice(0, 10);
+  const time = now.toTimeString().slice(0, 8).replace(/:/g, '-');
+  link.download = `equipos-${date}_${time}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 function analizarEquipos(equipos, tipoGrupo, numAlumnos, opcionSobrantes) {
@@ -1012,23 +1906,76 @@ function mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes) {
   }
 }
 
+function resetApplication() {
+  try { localStorage.clear(); } catch (e) {}
+  incompatibleGroups = [];
+  lastReportData = null;
+  // Rellenar con ejemplos según el idioma actual
+  Object.entries(SAMPLE_NAME_GROUPS).forEach(([elementId, groupKey]) => {
+    const textarea = document.getElementById(elementId);
+    if (!textarea) return;
+    const sampleValue = formatSampleNames(currentLanguage, groupKey);
+    textarea.value = sampleValue || '';
+    textarea.dataset.sampleLang = currentLanguage;
+  });
+  // Sincroniza estructuras y UI
+  updateAssignmentsFromTextareas();
+  clearIncompatibleGroups();
+  const resultadosDiv = document.getElementById('resultados');
+  if (resultadosDiv) resultadosDiv.innerHTML = '';
+  const reportDiv = document.getElementById('report');
+  if (reportDiv) reportDiv.innerHTML = '';
+  showImportStatus(null);
+  showFullImportStatus('');
+  showQuickPasteStatus(null);
+  updateInfoGrupos();
+  refreshIncompatiblesUI();
+  mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
+  saveAppState();
+}
+
 function initialise() {
   setupSampleNamesMetadata();
   const savedLang = localStorage.getItem('preferredLanguage');
   const initialLang = savedLang || detectBrowserLanguage();
   setLanguage(initialLang);
+  // Intentar cargar estado persistente (nombres por líneas, sin comas)
+  loadAppState();
   initNumberSelector();
   initTypologyColumns();
+  initImportModal();
+  initFullImport();
+  initTypologyModal();
+  renderAssignmentsTable();
   document.getElementById('grupoA').addEventListener('input', handleNamesInput);
   document.getElementById('grupoB').addEventListener('input', handleNamesInput);
   document.getElementById('grupoC').addEventListener('input', handleNamesInput);
   document.getElementById('addIncompatibleBtn').addEventListener('click', addIncompatibleGroup);
   document.getElementById('clearIncompatiblesBtn').addEventListener('click', clearIncompatibleGroups);
   document.querySelectorAll('input[name="sobrantes"]').forEach(radio => {
-    radio.addEventListener('change', refreshIncompatiblesUI);
+    radio.addEventListener('change', () => { refreshIncompatiblesUI(); saveAppState(); });
+  });
+  document.querySelectorAll('input[name="tipoGrupo"]').forEach(radio => {
+    radio.addEventListener('change', () => { saveAppState(); if (lastReportData) mostrarInforme(lastReportData.equipos, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes()); });
   });
   document.getElementById('generarGrupos').addEventListener('click', generarYMostrarEquipos);
   document.getElementById('clearAllBtn').addEventListener('click', clearAllNames);
+  const exportAllBtn = document.getElementById('exportAllBtn');
+  if (exportAllBtn) exportAllBtn.addEventListener('click', exportAllData);
+  const exportAllBtn2 = document.getElementById('exportAllBtn2');
+  if (exportAllBtn2) exportAllBtn2.addEventListener('click', exportAllData);
+  const openFullImportBtn = document.getElementById('openFullImportBtn');
+  if (openFullImportBtn) openFullImportBtn.addEventListener('click', openFullImportModal);
+  const openFullImportBtn2 = document.getElementById('openFullImportBtn2');
+  if (openFullImportBtn2) openFullImportBtn2.addEventListener('click', openFullImportModal);
+  const quickPasteBtn = document.getElementById('quickPasteBtn');
+  if (quickPasteBtn) quickPasteBtn.addEventListener('click', () => {
+    const area = document.getElementById('quickPasteNames');
+    const count = addStudentsFromNamesOnly(area ? area.value : '');
+    if (count !== null && area) area.value = '';
+  });
+  const resetBtn = document.getElementById('resetAppBtn');
+  if (resetBtn) resetBtn.addEventListener('click', resetApplication);
   updateInfoGrupos();
   refreshIncompatiblesUI();
   mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
