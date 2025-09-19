@@ -11,10 +11,17 @@ GeCo es una aplicación web pensada para docentes de ESO y Bachillerato que nece
 
 ## Uso rápido
 1. Clona el repositorio y abre `index.html` en un navegador moderno.
-2. Introduce los nombres del alumnado por tipologías.
+2. Introduce los nombres del alumnado por tipologías. Un nombre por línea (las comas no separan).
 3. Define el tamaño del equipo, el tipo de agrupación y el tratamiento de sobrantes.
 4. Define incompatibilidades si las hubiera y pulsa «Generar equipos».
 5. Revisa el informe para comprobar si los grupos satisfacen tus requisitos.
+
+### Importar / Exportar
+- En la ficha «Datos del alumnado» puedes:
+  - Importar archivo (exportado en JSON): recupera nombres+tipologías, incompatibilidades y equipos (puedes elegir qué traer).
+  - Exportar todo (formato JSON): guarda el estado completo con fecha y hora.
+  - Pegar nombres: un nombre por línea.
+- Tras generar equipos: «Exportar equipos a hoja de cálculo» (CSV entrecomillado, respetando comas en nombres) o «Copiar equipos».
 
 Para más detalles didácticos consulta `instr.html`.
 
