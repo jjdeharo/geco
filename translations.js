@@ -77,7 +77,7 @@ const TRANSLATIONS = {
     },
     assignModal: {
       openButton: 'Asignar tipologías',
-      helper: 'Escribe los nombres en las tres tipologías y ajústalas en la ventana de asignación.',
+      helper: 'Escribe los nombres en las tres tipologías y ajústalas en la ventana de asignación o pulsa el botón Asignar tipologías.',
       title: 'Asignar tipologías',
       description: 'Edita los nombres y selecciona la tipología adecuada para cada alumno. Los cambios se guardan automáticamente.',
       closeButton: 'Cerrar'
@@ -219,7 +219,7 @@ const TRANSLATIONS = {
     },
     assignModal: {
       openButton: 'Assignar tipologies',
-      helper: "Escriu els noms a les tres tipologies i ajusta-les a la finestra d'assignació.",
+      helper: "Escriu els noms a les tres tipologies i ajusta-les a la finestra d'assignació o prem el botó Assignar tipologies.",
       title: 'Assignar tipologies',
       description: 'Edita els noms i selecciona la tipologia adequada per a cada alumne. Els canvis es guarden automàticament.',
       closeButton: 'Tanca'
@@ -358,7 +358,7 @@ const TRANSLATIONS = {
     },
     assignModal: {
       openButton: 'Assign typologies',
-      helper: 'Type names in the three typologies and adjust them in the assignment window.',
+      helper: 'Type names in the three typologies and adjust them in the assignment window or click the Assign typologies button.',
       title: 'Assign typologies',
       description: 'Edit the names and pick the right typology for each student. Changes are saved automatically.',
       closeButton: 'Close'
@@ -497,7 +497,7 @@ const TRANSLATIONS = {
     },
     assignModal: {
       openButton: 'Asignar tipoloxías',
-      helper: 'Escribe os nomes nas tres tipoloxías e axústaas na xanela de asignación.',
+      helper: 'Escribe os nomes nas tres tipoloxías e axústaas na xanela de asignación ou preme o botón Asignar tipoloxías.',
       title: 'Asignar tipoloxías',
       description: 'Edita os nomes e selecciona a tipoloxía axeitada para cada alumno. Os cambios gárdanse automaticamente.',
       closeButton: 'Pechar'
