@@ -17,13 +17,10 @@ jobs:
         include:
           - os: ubuntu-latest
             display: Linux
-            upload_patterns: "*.AppImage *.deb *.tar.gz"
           - os: windows-latest
             display: Windows
-            upload_patterns: "*.exe *.zip"
           - os: macos-latest
             display: macOS
-            upload_patterns: "*.dmg *.zip"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       CSC_IDENTITY_AUTO_DISCOVERY: false
@@ -47,7 +44,7 @@ jobs:
         run: npm ci
 
       - name: Build distributables
-        run: npm run dist -- --publish never
+        run: npm run dist -- --publish always
 
       - name: Upload packaged artifacts
         uses: actions/upload-artifact@v4
@@ -55,27 +52,3 @@ jobs:
           name: geco-${{ matrix.display }}
           path: dist/
           if-no-files-found: warn
-
-      - name: Attach installers to GitHub release
-        shell: bash
-        env:
-          TAG_NAME: ${{ github.event.release.tag_name }}
-          UPLOAD_PATTERNS: ${{ matrix.upload_patterns }}
-        run: |
-          shopt -s nullglob
-          files=()
-          for pattern in $UPLOAD_PATTERNS; do
-            for file in dist/$pattern; do
-              if [ -f "$file" ]; then
-                files+=("$file")
-              fi
-            done
-          done
-
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "No installers found for patterns: $UPLOAD_PATTERNS"
-            exit 1
-          fi
-
-          echo "Uploading files: ${files[*]}"
-          gh release upload "$TAG_NAME" "${files[@]}" --clobber
