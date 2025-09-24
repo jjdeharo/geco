@@ -3,7 +3,7 @@
   "version": "2.3.1",
   "description": "Generador de equipos cooperativos para docentes (ESO y Bachillerato).",
   "main": "electron/main.js",
-  "author": "Juan José de Haro <juanjo@bilateria.org>",
+  "author": "Juan Jos\u00e9 de Haro <juanjo@bilateria.org>",
   "license": "AGPL-3.0-only",
   "homepage": "https://github.com/jjdeharo/geco",
   "repository": {
@@ -19,7 +19,7 @@
   "build": {
     "appId": "org.bilateria.geco",
     "productName": "GeCo",
-    "copyright": "© 2025 Juan José de Haro",
+    "copyright": "\u00a9 2025 Juan Jos\u00e9 de Haro",
     "directories": {
       "buildResources": "build",
       "output": "dist"
@@ -61,7 +61,13 @@
         "nsis",
         "portable"
       ]
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "releaseType": "release"
+      }
+    ]
   },
   "devDependencies": {
     "electron": "^31.4.0",
