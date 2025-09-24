@@ -281,6 +281,7 @@ function mostrarResultados(grupos) {
     const cellMiembros = row.insertCell();
     cellMiembros.style.padding = "10px";
     cellMiembros.style.borderBottom = "1px solid #ddd";
+    cellMiembros.style.whiteSpace = "pre-line";
     
     const lang = document.getElementById('es-btn')?.classList.contains('active') ? 'es' : 'ca';
     
@@ -302,7 +303,7 @@ function mostrarResultados(grupos) {
     // Ordenar miembros alfabéticamente
     miembrosFormateados.sort();
     
-    cellMiembros.textContent = miembrosFormateados.join(", ");
+    cellMiembros.textContent = miembrosFormateados.join("\n");
   });
   
   resultadosDiv.appendChild(table);
