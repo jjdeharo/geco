@@ -25,6 +25,19 @@ GeCo es una aplicación web pensada para docentes de ESO y Bachillerato que nece
 
 Para más detalles didácticos consulta `instr.html`.
 
+## Modo escritorio (Electron)
+1. Instala [Node.js](https://nodejs.org) 18 o superior.
+2. Ejecuta `npm install` para descargar Electron y las dependencias de empaquetado.
+3. Usa `npm run dev` durante el desarrollo (recarga manual).
+4. Lanza `npm run pack` para generar una app sin instalador o `npm run dist` para empaquetar instaladores multiplataforma (salida en `dist/`).
+
+### Personalizar la distribución
+- Coloca los iconos en `build/icons/` (el `icon.png` principal se usa como base para Windows, macOS y Linux).
+- Ajusta las plataformas/arquitecturas objetivo editando la sección `build` de `package.json`.
+- Añade recursos adicionales (documentación, plantillas, etc.) actualizando los patrones de `files` en `package.json`.
+
+
+
 ## Licencias
 - **Código**: [AGPL v3](https://www.gnu.org/licenses/agpl-3.0.html)
 - **Contenidos educativos** (textos, imágenes, etc.): [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)

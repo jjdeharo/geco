@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.0 — 2025-09-24
+
+- Soporte oficial para aplicación de escritorio con Electron (procesos principal y preload).
+- Configuración de empaquetado multiplataforma mediante electron-builder.
+- Documentación y comandos npm para desarrollo y distribución de la versión de escritorio.
+- Menú nativo multilingüe con acceso directo a la guía pedagógica.
+
 ## 2.2 — 2025-09-19
 
 - Importar/Exportar TODO en JSON con fecha y hora.

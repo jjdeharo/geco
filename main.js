@@ -1219,6 +1219,9 @@ function setLanguage(lang) {
   currentLanguage = lang;
   document.documentElement.setAttribute('lang', lang);
   localStorage.setItem('preferredLanguage', lang);
+  if (typeof window !== 'undefined' && window.gecoAPI && typeof window.gecoAPI.setLanguage === 'function') {
+    window.gecoAPI.setLanguage(lang);
+  }
   applyTranslations();
   buildLanguageSwitcher();
   applySampleNamesForLanguage(currentLanguage, previousLanguage);

@@ -1,0 +1,10 @@
+# Node / Electron dependencies
+node_modules/
+
+# Build artifacts
+dist/
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db

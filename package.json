@@ -1,0 +1,73 @@
+{
+  "name": "geco",
+  "version": "2.3.0",
+  "description": "Generador de equipos cooperativos para docentes (ESO y Bachillerato).",
+  "main": "electron/main.js",
+  "author": "Juan José de Haro <juanjo@bilateria.org>",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/jjdeharo/geco",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jjdeharo/geco.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "org.bilateria.geco",
+    "productName": "GeCo",
+    "copyright": "© 2025 Juan José de Haro",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "asar": true,
+    "files": [
+      "**/*",
+      "!dist{,/**/*}",
+      "!node_modules{,/**/*}",
+      "!geco-*.zip",
+      "!geco-*.tar.gz",
+      "!geco-*.tgz",
+      "!*.log"
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build/icons/icon.png"
+    },
+    "linux": {
+      "category": "Education",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icons"
+    },
+    "win": {
+      "icon": "build/icons/icon.png",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^31.4.0",
+    "electron-builder": "^25.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
