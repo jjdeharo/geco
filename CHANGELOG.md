@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.1 — 2025-09-24
+
+- Resultados de equipos y ejemplos iniciales muestran cada alumno en una línea para facilitar la lectura.
+- Tarjetas informativas y títulos de opciones con estilo de panel, evitando confusión con botones.
+
 ## 2.3.0 — 2025-09-24
 
 - Soporte oficial para aplicación de escritorio con Electron (procesos principal y preload).
