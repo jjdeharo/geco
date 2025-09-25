@@ -36,6 +36,16 @@ Para más detalles didácticos consulta `instr.html`.
 - Ajusta las plataformas/arquitecturas objetivo editando la sección `build` de `package.json`.
 - Añade recursos adicionales (documentación, plantillas, etc.) actualizando los patrones de `files` en `package.json`.
 
+### Descargas listas (v2.4.0)
+Las versiones empaquetadas están en la sección de [Releases](https://github.com/jjdeharo/geco/releases). En cada enlace se indica qué obtendrás al descargarlo:
+
+- **Windows (instalador con asistente)** → [GeCo-Setup-2.4.0.exe](https://github.com/jjdeharo/geco/releases/download/v2.4.0/GeCo-Setup-2.4.0.exe): instala la aplicación en `C:\Archivos de programa\GeCo`, crea accesos directos y gestiona actualizaciones.
+- **Windows (portable)** → [GeCo-2.4.0.exe](https://github.com/jjdeharo/geco/releases/download/v2.4.0/GeCo-2.4.0.exe): ejecutable auto-contenido para llevar en un USB sin instalación.
+- **macOS (Intel y Apple Silicon)** → [GeCo-2.4.0.dmg](https://github.com/jjdeharo/geco/releases/download/v2.4.0/GeCo-2.4.0.dmg): imagen universal, arrástrala a `Aplicaciones`.
+- **macOS (Apple Silicon optimizado)** → [GeCo-2.4.0-arm64.dmg](https://github.com/jjdeharo/geco/releases/download/v2.4.0/GeCo-2.4.0-arm64.dmg): mismo contenido, compilado específicamente para chips M1/M2.
+- **Linux (AppImage)** → [GeCo-2.4.0.AppImage](https://github.com/jjdeharo/geco/releases/download/v2.4.0/GeCo-2.4.0.AppImage): binario portable, marca el archivo como ejecutable y lánzalo sin instalar.
+- **Linux (paquete DEB)** → [geco_2.4.0_amd64.deb](https://github.com/jjdeharo/geco/releases/download/v2.4.0/geco_2.4.0_amd64.deb): instalador para Debian, Ubuntu y derivadas de 64 bits.
+
 
 
 ## Licencias
