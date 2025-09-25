@@ -140,7 +140,7 @@ const TRANSLATIONS = {
     ,
     state: {
       title: 'Datos del alumnado',
-      legend: 'Puedes importar un archivo de exportación de GeCo (.json) o pegar los nombres en la caja de la derecha. Se guardarán nombres, tipologías, grupos incompatibles y equipos.',
+      legend: 'Puedes importar un archivo de exportación de GeCo (.json) o pegar los nombres en la caja de la derecha.',
       pasteTitle: 'O pegar nombres del alumnado',
       pastePlaceholder: 'Un nombre por línea',
       pasteButton: 'Cargar nombres',
@@ -282,7 +282,7 @@ const TRANSLATIONS = {
     ,
     state: {
       title: 'Dades de l\'alumnat',
-      legend: "Pots importar un fitxer d'exportació de GeCo (.json) o enganxar els noms a la caixa de la dreta. Es desaran noms, tipologies, grups incompatibles i equips.",
+      legend: "Pots importar un fitxer d'exportació de GeCo (.json) o enganxar els noms a la caixa de la dreta.",
       pasteTitle: "O enganxa els noms de l'alumnat",
       pastePlaceholder: 'Un nom per línia',
       pasteButton: 'Carregar noms',
@@ -421,7 +421,7 @@ const TRANSLATIONS = {
     ,
     state: {
       title: 'Student data',
-      legend: 'Import a previously exported GeCo file (.json) or paste the names on the right. The export includes names, typologies, incompatible groups and teams.',
+      legend: 'Import a previously exported GeCo file (.json) or paste the names on the right.',
       pasteTitle: 'Or paste student names',
       pastePlaceholder: 'One name per line',
       pasteButton: 'Load names',
@@ -560,7 +560,7 @@ const TRANSLATIONS = {
     ,
     state: {
       title: 'Datos do alumnado',
-      legend: 'Importa un ficheiro de exportación de GeCo (.json) ou pega os nomes na caixa da dereita. Gardaranse nomes, tipoloxías, grupos incompatibles e equipos.',
+      legend: 'Importa un ficheiro de exportación de GeCo (.json) ou pega os nomes na caixa da dereita.',
       pasteTitle: 'Ou pegar nomes do alumnado',
       pastePlaceholder: 'Un nome por liña',
       pasteButton: 'Cargar nomes',
@@ -699,7 +699,7 @@ const TRANSLATIONS = {
     ,
     state: {
       title: 'Ikasleen datuak',
-      legend: 'GeCo-tik esportatutako fitxategi bat (.json) inportatu edo eskuineko koadroan izenak itsatsi. Gordetzen dira: izenak, tipologiak, bateraezinak eta taldeak.',
+      legend: 'GeCo-tik esportatutako fitxategi bat (.json) inportatu edo eskuineko koadroan izenak itsatsi.',
       pasteTitle: 'Edo itsatsi ikasleen izenak',
       pastePlaceholder: 'Izen bat lerroko',
       pasteButton: 'Izenak kargatu',
