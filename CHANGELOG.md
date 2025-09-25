@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.4.0 — 2025-09-25
+
+- Retirada la opción de "Exportar todo" de la ficha Datos del alumnado para evitar confusiones con la exportación de informes.
+- Texto de ayuda actualizado en todos los idiomas para reflejar las acciones disponibles (importar o pegar alumnado).
+
 ## 2.3.1 — 2025-09-24
 
 - Resultados de equipos y ejemplos iniciales muestran cada alumno en una línea para facilitar la lectura.
@@ -28,4 +33,3 @@
 ## 2.1 — omitida
 
 - Cambios intermedios que se consolidan en 2.2.
-
