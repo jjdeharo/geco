@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.5.0 — 2026-03-13
+
+- Refactorizado el motor de generación de equipos en un módulo independiente reutilizable.
+- Separado el análisis del informe en un módulo propio, con pruebas automáticas.
+- Unificada la guía de uso con la misma fuente de traducciones que la aplicación.
+- Eliminado código legado no usado y simplificada la inicialización principal.
+- Acotado el empaquetado de Electron a los archivos estrictamente necesarios.
+- Añadida una batería inicial de pruebas para generación de equipos e informe.
+
 ## 2.4.0 — 2025-09-25
 
 - Retirada la opción de "Exportar todo" de la ficha Datos del alumnado para evitar confusiones con la exportación de informes.
