@@ -8,11 +8,12 @@
   "homepage": "https://github.com/jjdeharo/geco",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jjdeharo/geco.git"
+    "url": "git@github.com:jjdeharo/geco.git"
   },
   "scripts": {
     "start": "electron .",
     "dev": "NODE_ENV=development electron .",
+    "test": "node --test tests/*.spec.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
@@ -26,13 +27,17 @@
     },
     "asar": true,
     "files": [
-      "**/*",
-      "!dist{,/**/*}",
-      "!node_modules{,/**/*}",
-      "!geco-*.zip",
-      "!geco-*.tar.gz",
-      "!geco-*.tgz",
-      "!*.log"
+      "index.html",
+      "instr.html",
+      "main.js",
+      "translations.js",
+      "team-engine.js",
+      "report-engine.js",
+      "favicon.svg",
+      "fig1.png",
+      "fig2.png",
+      "electron/**/*",
+      "build/icons/**/*"
     ],
     "mac": {
       "category": "public.app-category.education",

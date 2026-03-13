@@ -236,7 +236,7 @@
       <div class="highlight">
         <p id="geco-intro">GeCo crea equipos aleatorios basándose en las condiciones definidas por el usuario.</p>
         <ol id="instructions-list">
-          <li><strong id="intro-names">Introducir los nombres de los alumnos</strong>, separados por comas o saltos de línea, en los espacios denominados: Tipología A, Tipología B y Tipología C. Podemos dejar una o dos de las tipologías vacías.
+          <li><strong id="intro-names">Introducir los nombres de los alumnos</strong>, un nombre por línea, en los espacios denominados: Tipología A, Tipología B y Tipología C. Las comas no separan nombres. Podemos dejar una o dos de las tipologías vacías.
             <p id="typically-text">Típicamente, se harán de la siguiente manera:</p>
             <ul>
               <li id="type-a">Tipología A: Personas autosuficientes que no requieren apoyo.</li>
@@ -268,211 +268,8 @@
     </footer>
   </div>
 
+  <script src="translations.js"></script>
   <script>
-    // Definir los textos para ambos idiomas
-    const translations = {
-      es: {
-        label: 'ES',
-        title: "Guía de GeCo",
-        backLink: "Volver a GeCo",
-        introText: "El programa GeCo facilita la formación de equipos de alumnos para el trabajo cooperativo, promoviendo la diversidad y mejorando la colaboración. La composición de los equipos puede ser <strong>heterogénea</strong>, <strong>homogénea</strong> o <strong>temporal</strong> según el objetivo del aprendizaje.",
-        justificationTitle: "Justificación teórica para la creación de equipos homogéneos y heterogéneos",
-        distributionText: "Para formar equipos, hay que distribuir a los estudiantes en tres subgrupos (tipologías A, B y C en este programa), según la propuesta de <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>. Cada grupo de 4 personas constará de los siguientes miembros:",
-        memberList: [
-          "A: Una persona con capacidad para ayudar.",
-          "B: Un par de miembros que sean más o menos autónomos.",
-          "C: Una persona que necesita ayuda."
-        ],
-        idealSize: "El tamaño ideal de los equipos cooperativos es de 4 integrantes. Si no es posible hacer grupos de 4, entonces se pueden hacer de 3 o de 5, pero nunca de más.",
-        heterogeneousTitle: "Equipos heterogéneos (equipos base)",
-        heterogeneousText: "Son grupos que durarán todo el curso o un trimestre. Favorecen el aprendizaje de nuevos conocimientos y se crean haciendo que en cada equipo estén representadas las tres tipologías (A, B y C).",
-        homogeneousTitle: "Equipos homogéneos (similares)",
-        homogeneousText: "Están formados por miembros con características similares y son adecuados para reforzar conocimientos ya adquiridos. Estos grupos se crean intentando que sean todos de la misma tipología (A, B o C). Como que normalmente los alumnos no cuadran exactamente en una tipología por grupo, podrán aparecer grupos con tipologías mezcladas.",
-        temporaryTitle: "Equipos temporales (esporádicos)",
-        temporaryText: "Estos equipos se forman para tareas cortas o cuando no se conoce al alumnado y se utilizan especialmente al principio del curso o para actividades simples y rápidas. Estas agrupaciones son uniformes, ya que no hay distinción entre unos grupos y otros. Se forman mediante una selección aleatoria de alumnos. En este caso, el programa elimina las etiquetas de los alumnos, A, B y C, puesto que ya no tienen sentido.",
-        howtoTitle: "Cómo utilizar GeCo",
-        gecoIntro: "GeCo crea equipos aleatorios basándose en las condiciones definidas por el usuario.",
-        introNames: "Introducir los nombres de los alumnos: un nombre por línea (las comas no separan)",
-        typicallyText: "Típicamente, se harán de la siguiente manera:",
-        typeA: "Tipología A: Personas autosuficientes que no requieren apoyo.",
-        typeB: "Tipología B: Personas que pueden trabajar de manera independiente pero con asistencia ocasional (la mayoría).",
-        typeC: "Tipología C: Personas que necesitan apoyo para poder progresar.",
-        otherGroups: "Lógicamente, podemos hacer otras agrupaciones, por ejemplo, si queremos hacer grupos para jugar al ajedrez podríamos poner en A aquellos que saben jugar, en B los que solo saben mover las piezas y en C los que desconocen el juego.",
-        membersNumber: "<strong>Definir el número de alumnos por equipo</strong>. Si la división no es exacta, algunos equipos tendrán un tamaño diferente.",
-        teamType: "<strong>Elegir el tipo de los equipos</strong>: heterogéneo, homogéneo o esporádico.",
-        leftoverMembers: "<strong>Decidir qué hacer con los miembros sobrantes</strong>. Puedes repartirlos entre los equipos existentes o crear uno nuevo.",
-        incompatiblesStep: "<strong>Configurar personas incompatibles</strong>. Selecciona los alumnos que no deben coincidir y añádelos como grupos incompatibles.",
-        generateButton: "Pulsa <strong>Generar equipos</strong> para obtenerlos. Cada pulsación produce una nueva distribución y un informe de cumplimiento.",
-        dataSection: "<strong>Datos del alumnado</strong>: puedes <em>importar un archivo exportado en JSON</em> (incluye nombres, tipologías, incompatibilidades y equipos) o <em>pegar los nombres</em> (un nombre por línea). También puedes <em>Exportar todo (formato JSON)</em> para guardarlo.",
-        assignTypologies: "<strong>Asignar tipologías</strong>: usa el botón <em>Asignar tipologías</em> para abrir la ventana, editar nombres y marcar A/B/C por fila. Los cambios se guardan automáticamente.",
-        exportTeams: "<strong>Tras generar equipos</strong>: puedes <em>Exportar equipos a hoja de cálculo</em> (CSV entrecomillado, listo para editar) o <em>Copiar equipos</em> al portapapeles.",
-        goToGeco: "Ir a GeCo",
-        labText: "Laboratorio de aplicaciones educativas <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-        authorText: "Aplicación hecha por <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
-        licenseText: "Esta obra está bajo una licencia <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>"
-      },
-      ca: {
-        label: 'CA',
-        title: "Guia de GeCo",
-        backLink: "Tornar a GeCo",
-        introText: "El programa GeCo facilita la formació d'equips d'alumnes per al treball cooperatiu, promovent la diversitat i millorant la col·laboració. La composició dels equips pot ser <strong>heterogènia</strong>, <strong>homogènia</strong> o <strong>temporal</strong> segons l'objectiu de l'aprenentatge.",
-        justificationTitle: "Justificació teòrica per a la creació d'equips homogenis i heterogenis",
-        distributionText: "Per formar equips, cal distribuir els estudiants en tres subgrups (tipologies A, B i C en aquest programa), segons la proposta de <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>. Cada grup de 4 persones constarà dels següents membres:",
-        memberList: [
-          "A: Una persona amb capacitat per ajudar.",
-          "B: Un parell de membres que siguin més o menys autònoms.",
-          "C: Una persona que necessita ajuda."
-        ],
-        idealSize: "La mida ideal dels equips cooperatius és de 4 integrants. Si no és possible fer grups de 4, llavors es poden fer de 3 o de 5, però mai de més.",
-        heterogeneousTitle: "Equips heterogenis (equips base)",
-        heterogeneousText: "Són grups que duraran tot el curs o un trimestre. Afavoreixen l'aprenentatge de nous coneixements i es creen fent que a cada equip estiguin representades les tres tipologies (A, B i C).",
-        homogeneousTitle: "Equips homogenis (similars)",
-        homogeneousText: "Estan formats per membres amb característiques similars i són adequats per reforçar coneixements ja adquirits. Aquests grups es creen intentant que siguin tots de la mateixa tipologia (A, B o C). Com que normalment els alumnes no quadren exactament en una tipologia per grup, podran aparèixer grups amb tipologies barrejades.",
-        temporaryTitle: "Equips temporals (esporàdics)",
-        temporaryText: "Aquests equips es formen per a tasques curtes o quan no es coneix l'alumnat i s'utilitzen especialment al principi del curs o per a activitats simples i ràpides. Aquestes agrupacions són uniformes, ja que no hi ha distinció entre uns grups i altres. Es formen mitjançant una selecció aleatòria d'alumnes. En aquest cas, el programa elimina les etiquetes dels alumnes, A, B i C, ja que no tenen sentit.",
-        howtoTitle: "Com utilitzar GeCo",
-        gecoIntro: "GeCo crea equips aleatoris basant-se en les condicions definides per l'usuari.",
-        introNames: "Introduir els noms dels alumnes: un nom per línia (les comes no separen)",
-        typicallyText: "Típicament, es faran de la següent manera:",
-        typeA: "Tipologia A: Persones autosuficients que no requereixen suport.",
-        typeB: "Tipologia B: Persones que poden treballar de manera independent però amb assistència ocasional (la majoria).",
-        typeC: "Tipologia C: Persones que necessiten suport per poder progressar.",
-        otherGroups: "Lògicament, podem fer altres agrupacions, per exemple, si volem fer grups per jugar als escacs podríem posar a A aquells que saben jugar, a B els que només saben moure les peces i a C els que desconeixen el joc.",
-        membersNumber: "<strong>Definir el nombre d'alumnes per equip</strong>. Si la divisió no és exacta, alguns equips tindran una mida diferent.",
-        teamType: "<strong>Triar el tipus dels equips</strong>: heterogeni, homogeni o esporàdic.",
-        leftoverMembers: "<strong>Decidir què fer amb els membres sobrants</strong>. Pots repartir-los entre els equips existents o crear-ne un de nou.",
-        incompatiblesStep: "<strong>Configurar persones incompatibles</strong>. Selecciona els alumnes que no han de coincidir i afegeix-los com a grups incompatibles.",
-        generateButton: "Prem <strong>Generar equips</strong> per obtenir-los. Cada vegada es genera una nova distribució i un informe de compliment.",
-        dataSection: "<strong>Dades de l'alumnat</strong>: pots <em>importar un fitxer exportat en JSON</em> (inclou noms, tipologies, incompatibilitats i equips) o <em>enganxar els noms</em> (un nom per línia). També pots <em>Exportar tot (format JSON)</em> per desar-ho.",
-        assignTypologies: "<strong>Assignar tipologies</strong>: fes servir el botó <em>Assignar tipologies</em> per obrir la finestra, editar noms i marcar A/B/C per fila. Els canvis es guarden automàticament.",
-        exportTeams: "<strong>Després de generar els equips</strong>: pots <em>Exportar equips a full de càlcul</em> (CSV entrecomillat) o <em>Copiar equips</em> al porta-retalls.",
-        goToGeco: "Anar a GeCo",
-        labText: "Laboratori d'aplicacions educatives <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-        authorText: "Aplicació feta per <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
-        licenseText: "Aquesta obra està sota una llicència <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>"
-      },
-      gl: {
-        label: 'GL',
-        title: "Guía de GeCo",
-        backLink: "Volver a GeCo",
-        introText: "O programa GeCo facilita a formación de equipos de alumnado para o traballo cooperativo, promovendo a diversidade e mellorando a colaboración. A composición dos equipos pode ser <strong>heteroxénea</strong>, <strong>homoxénea</strong> ou <strong>temporal</strong> segundo o obxectivo da aprendizaxe.",
-        justificationTitle: "Xustificación teórica para a creación de equipos homoxéneos e heteroxéneos",
-        distributionText: "Para formar equipos cómpre distribuír o alumnado en tres subgrupos (tipoloxías A, B e C neste programa), segundo a proposta de <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>. Cada grupo de 4 persoas incluirá:",
-        memberList: [
-          "A: Unha persoa con capacidade para axudar.",
-          "B: Dúas persoas máis ou menos autónomas.",
-          "C: Unha persoa que precisa apoio."
-        ],
-        idealSize: "O tamaño ideal dos equipos cooperativos é de 4 integrantes. Se non é posible facer grupos de 4, pueden facerse de 3 ou de 5, pero nunca máis grandes.",
-        heterogeneousTitle: "Equipos heteroxéneos (equipos base)",
-        heterogeneousText: "Son grupos que duran todo o curso ou un trimestre. Favorecen a aprendizaxe de novos contidos e créanse asegurando que en cada equipo aparezan as tres tipoloxías (A, B e C).",
-        homogeneousTitle: "Equipos homoxéneos (semellantes)",
-        homogeneousText: "Formados por alumnado con características semellantes, son axeitados para reforzar coñecementos xa adquiridos. O programa tenta que cada equipo sexa dunha soa tipoloxía, aínda que pode haber mesturas cando os números non cadran.",
-        temporaryTitle: "Equipos temporais (aleatorios)",
-        temporaryText: "Formanse para tarefas curtas ou cando o profesorado aínda non coñece o alumnado. Úsanse especialmente a comezos de curso ou para actividades rápidas. Todos os equipos son uniformes e os alumnos asígnanse ao azar, polo que as etiquetas A, B e C pérdense.",
-        howtoTitle: "Como utilizar GeCo",
-        gecoIntro: "GeCo crea equipos aleatorios en función das condicións definidas polo profesorado.",
-        introNames: "Introducir os nomes do alumnado: un nome por liña (as comas non separan)",
-        typicallyText: "Habitualmente as listas cúbrense do seguinte xeito:",
-        typeA: "Tipoloxía A: Persoas autónomas que non precisan apoio.",
-        typeB: "Tipoloxía B: Persoas que traballan con autonomía pero precisan axuda puntual (a maioría).",
-        typeC: "Tipoloxía C: Persoas que precisan apoio para progresar.",
-        otherGroups: "Evidentemente pódense facer outras agrupacións; por exemplo, para unha actividade de xadrez poderiamos colocar en A quen xa sabe xogar, en B quen só coñece os movementos e en C quen non coñece o xogo.",
-        membersNumber: "<strong>Definir o número de persoas por equipo</strong>. Se a división non é exacta, algún equipo terá un tamaño diferente.",
-        teamType: "<strong>Escoller o tipo de equipo</strong>: heteroxéneo, homoxéneo ou aleatorio.",
-        leftoverMembers: "<strong>Decidir que facer co alumnado sobrante</strong>. Pódese repartilo entre os equipos existentes ou crear un grupo novo.",
-        incompatiblesStep: "<strong>Configurar persoas incompatibles</strong>. Selecciona os estudantes que non deben coincidir e engádeos como grupos incompatibles.",
-        generateButton: "Preme <strong>Xerar equipos</strong> para obtelos. Cada xeración produce unha nova distribución e un informe de cumprimento.",
-        dataSection: "<strong>Datos do alumnado</strong>: podes <em>importar un ficheiro exportado en JSON</em> (inclúe nomes, tipoloxías, incompatibilidades e equipos) ou <em>pegar os nomes</em> (un por liña). Tamén podes <em>Exportar todo (formato JSON)</em> para gardar.",
-        assignTypologies: "<strong>Asignar tipoloxías</strong>: usa o botón <em>Asignar tipoloxías</em> para abrir a xanela, editar nomes e marcar A/B/C por fila. Os cambios gárdanse automaticamente.",
-        exportTeams: "<strong>Despois de xerar os equipos</strong>: podes <em>Exportar equipos a folla de cálculo</em> (CSV entrecomillado) ou <em>Copiar equipos</em> ao portapapeis.",
-        goToGeco: "Ir a GeCo",
-        labText: "Laboratorio de aplicacións educativas <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-        authorText: "Aplicación creada por <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
-        licenseText: "Esta obra está baixo unha licenza <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>"
-      },
-      eu: {
-        label: 'EU',
-        title: "GeCo gida",
-        backLink: "Itzuli GeCora",
-        introText: "GeCo programak ikasleen talde kooperatiboak sortzea errazten du, aniztasuna eta lankidetza sustatuz. Taldeen osaera <strong>heterogeneoa</strong>, <strong>homogeneoa</strong> edo <strong>aldi baterakoa</strong> izan daiteke ikasketa helburuaren arabera.",
-        justificationTitle: "Talde homogeneo eta heterogeneoen oinarri teorikoa",
-        distributionText: "Taldeak osatzeko, ikasleak hiru azpitaldetan (A, B eta C tipologiak) banatzen dira, <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a> proposamenari jarraituz. Lau kideko talde bakoitzak honakoak izango ditu:",
-        memberList: [
-          "A: Besteak laguntzeko gaitasuna duen ikasle bat.",
-          "B: Nahiko autonomoak diren bi kide.",
-          "C: Laguntza behar duen ikasle bat."
-        ],
-        idealSize: "Talde kooperatiboetarako tamaina egokiena 4 kidekoa da. Hala ezin bada, taldeak 3 edo 5 kidekoak izan daitezke, baina ez handiagoak.",
-        heterogeneousTitle: "Talde heterogeneoak (oinarrizko taldeak)",
-        heterogeneousText: "Kurtso osoan edo hiruhileko batean mantentzen diren taldeak dira. Ezagutza berriak ikastea errazten dute eta hiru tipologiak (A, B eta C) talde bakoitzean egotea bilatzen da.",
-        homogeneousTitle: "Talde homogeneoak (antzekoak)",
-        homogeneousText: "Antzeko ezaugarriak dituzten pertsonez osatuta daude eta aurrez ikasitako edukiak sendotzeko egokiak dira. Taldeak tipologia bereko ikasleekin osatzen saiatzen da, baina askotan zenbakiak ez datozenez bat, tipologia nahasiak ager daitezke.",
-        temporaryTitle: "Aldi baterako taldeak (ausazkoak)",
-        temporaryText: "Epe laburreko jardueretarako edo irakasleak oraindik ikasleak ezagutzen ez dituenean erabiltzen dira, ikasturte hasieran bereziki. Taldeak uniformea dira eta ikasleak ausaz esleitzen dira, beraz A, B eta C etiketek ez dute zentzurik.",
-        howtoTitle: "Nola erabili GeCo",
-        gecoIntro: "GeCok irakasleak definitutako baldintzetan oinarrituta sortzen ditu taldeak.",
-        introNames: "Idatzi ikasleen izenak: lerroko izen bat (komek ez dute banatzen)",
-        typicallyText: "Orokorrean, zerrendak honela betetzen dira:",
-        typeA: "A tipologia: Autonomoak eta laguntzarik behar ez duten pertsonak.",
-        typeB: "B tipologia: Bere kabuz lan egiten duten baina noizbehinka laguntza behar dutenak (gehienak).",
-        typeC: "C tipologia: Aurrera egiteko laguntza behar dutenak.",
-        otherGroups: "Jakina, beste sailkapen batzuk ere erabil daitezke; esaterako, xake jarduera baterako A taldean jada jokatzen dakitenak jarri, B taldean mugimenduak besterik ez dakitenak eta C taldean erabat berriak direnak.",
-        membersNumber: "<strong>Zehaztu taldeko kide kopurua</strong>. Zatiketa ez bada zehatza, talde batek baino gehiagok neurri desberdina izango du.",
-        teamType: "<strong>Aukeratu taldeen mota</strong>: heterogeneoa, homogeneoa edo ausazkoa.",
-        leftoverMembers: "<strong>Erabaki zer egin soberan geratzen direnekin</strong>. Taldeetan bana ditzakezu edo talde berri bat sor dezakezu.",
-        incompatiblesStep: "<strong>Konfiguratu bateraezinak</strong>. Hautatu elkarrekin egon ezin duten ikasleak eta gorde talde bateraezin gisa.",
-        generateButton: "Sakatu <strong>Taldeak sortu</strong> banaketa berria eta betetze-txostena lortzeko.",
-        dataSection: "<strong>Ikasleen datuak</strong>: <em>JSON gisa esportatutako fitxategia</em> inporta dezakezu (izenak, tipologiak, bateraezinak eta taldeak barne) edo <em>izenak itsatsi</em> (lerroko izen bat). Halaber, <em>Dena esportatu (JSON)</em> aukera dago gordetzeko.",
-        assignTypologies: "<strong>Tipologiak esleitu</strong>: erabili <em>Tipologiak esleitu</em> botoia leihoa irekitzeko, izenak editatzeko eta A/B/C markatzeko errenkada bakoitzean. Aldaketak automatikoki gordetzen dira.",
-        exportTeams: "<strong>Taldeak sortu ondoren</strong>: <em>Taldeak kalkulu-orritara esportatu</em> (CSV komatxoekin) edo <em>Taldeak kopiatu</em> arbelean.",
-        goToGeco: "Joan GeCora",
-        labText: "Hezkuntza-aplikazioen laborategia <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-        authorText: "Aplikazioa <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>-k egina",
-        licenseText: "Lan hau <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a> lizentziapean dago"
-      },
-      en: {
-        label: 'EN',
-        title: "GeCo Guide",
-        backLink: "Back to GeCo",
-        introText: "The GeCo program helps teachers create cooperative student teams, promoting diversity and improving collaboration. Teams can be <strong>heterogeneous</strong>, <strong>homogeneous</strong>, or <strong>temporary</strong> depending on the learning goal.",
-        justificationTitle: "Theoretical justification for heterogeneous and homogeneous teams",
-        distributionText: "To build teams, split the students into three subgroups (typologies A, B and C in this tool) following the proposal by <a href=\"https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf\">Pujolàs & Lago, 2011</a>. Every group of four should contain:",
-        memberList: [
-          "A: A student who can support peers.",
-          "B: Two fairly autonomous students.",
-          "C: A student who needs support."
-        ],
-        idealSize: "The ideal size for cooperative teams is four members. If that is not possible, use teams of three or five, but never larger.",
-        heterogeneousTitle: "Heterogeneous teams (base teams)",
-        heterogeneousText: "These groups usually last a term or the whole year. They favour new learning and ensure that each team includes the three typologies (A, B and C).",
-        homogeneousTitle: "Homogeneous teams (similar)",
-        homogeneousText: "They group students with similar characteristics and are appropriate to consolidate previously learned content. The tool tries to keep all members within the same typology (A, B or C). Because numbers seldom match perfectly, some teams may mix typologies.",
-        temporaryTitle: "Temporary teams (random)",
-        temporaryText: "These teams are created for short tasks or when the teacher does not yet know the class. They are especially useful at the beginning of the year or for quick activities. All teams are uniform because students are assigned randomly, so the A, B, C labels are ignored.",
-        howtoTitle: "How to use GeCo",
-        gecoIntro: "GeCo creates teams based on the options you choose.",
-        introNames: "Enter student names: one name per line (commas do not split)",
-        typicallyText: "Typically:",
-        typeA: "Type A: Self-sufficient students who do not need support.",
-        typeB: "Type B: Students who work independently with occasional support (most of them).",
-        typeC: "Type C: Students who need support to progress.",
-        otherGroups: "You can adapt the typologies to your needs (e.g., chess skill levels).",
-        membersNumber: "<strong>Set the target team size</strong>. Some teams may differ if the division is not exact.",
-        teamType: "<strong>Choose the team type</strong>: heterogeneous, homogeneous or random.",
-        leftoverMembers: "<strong>Decide what to do with leftovers</strong>: add to others or create a new team.",
-        incompatiblesStep: "<strong>Set incompatible students</strong>: select and add them as incompatible groups.",
-        generateButton: "Click <strong>Generate teams</strong>. Each click produces a fresh distribution and a compliance report.",
-        dataSection: "<strong>Student data</strong>: you can <em>import an exported JSON file</em> (includes names, typologies, incompatible groups and teams) or <em>paste names</em> (one per line). You can also <em>Export all (JSON)</em> to save.",
-        assignTypologies: "<strong>Assign typologies</strong>: use the <em>Assign typologies</em> button to edit names and mark A/B/C per row. Changes are saved automatically.",
-        exportTeams: "<strong>After generating teams</strong>: you can <em>Export teams to spreadsheet</em> (quoted CSV) or <em>Copy teams</em> to the clipboard.",
-        goToGeco: "Go to GeCo",
-        labText: "Educational Applications Lab <a href='https://labia.tiddlyhost.com' target='_blank'>LABIA</a>",
-        authorText: "Application by <a href='https://bilateria.org' target='_blank'>Juan José de Haro</a>",
-        licenseText: "This work is licensed under <a href='https://creativecommons.org/licenses/by-sa/4.0/' target='_blank'>Creative Commons BY-SA</a>"
-      }
-    };
-
     const languageOrder = ['es', 'ca', 'gl', 'eu', 'en'];
     const DEFAULT_LANGUAGE = 'es';
     let currentLanguage = DEFAULT_LANGUAGE;
@@ -483,14 +280,19 @@
       return match || DEFAULT_LANGUAGE;
     }
 
+    function getGuideTranslations(lang) {
+      const selected = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANGUAGE];
+      return selected.guide || TRANSLATIONS[DEFAULT_LANGUAGE].guide;
+    }
+
     function buildLanguageSwitcher() {
       const container = document.getElementById('languageSwitcher');
       if (!container) return;
       container.innerHTML = '';
-      languageOrder.filter(code => translations[code]).forEach(code => {
+      languageOrder.filter(code => TRANSLATIONS[code]).forEach(code => {
         const btn = document.createElement('button');
         btn.className = 'lang-btn';
-        btn.textContent = translations[code].label || code.toUpperCase();
+        btn.textContent = TRANSLATIONS[code].languageName || code.toUpperCase();
         if (code === currentLanguage) {
           btn.classList.add('active');
         }
@@ -504,8 +306,9 @@
     }
 
     function applyTranslations() {
-      const langData = translations[currentLanguage] || translations[DEFAULT_LANGUAGE];
-      document.getElementById('title').innerText = langData.title;
+      const langData = getGuideTranslations(currentLanguage);
+      document.title = langData.pageTitle;
+      document.getElementById('title').innerText = langData.pageTitle;
       document.getElementById('back-link').innerText = langData.backLink;
       document.getElementById('intro-text').innerHTML = langData.introText;
       document.getElementById('justification-title').innerText = langData.justificationTitle;
@@ -528,7 +331,6 @@
       document.getElementById('temporary-text').innerText = langData.temporaryText;
       document.getElementById('howto-title').innerText = langData.howtoTitle;
       document.getElementById('geco-intro').innerText = langData.gecoIntro;
-
       document.getElementById('intro-names').innerText = langData.introNames;
       document.getElementById('typically-text').innerText = langData.typicallyText;
       document.getElementById('type-a').innerText = langData.typeA;
@@ -540,22 +342,19 @@
       document.getElementById('members-number').innerHTML = langData.membersNumber;
       document.getElementById('team-type').innerHTML = langData.teamType;
       document.getElementById('leftover-members').innerHTML = langData.leftoverMembers;
-      const incompatiblesItem = document.getElementById('incompatibles-step');
-      if (incompatiblesItem && langData.incompatiblesStep) {
-        incompatiblesItem.innerHTML = langData.incompatiblesStep;
-      }
+      document.getElementById('incompatibles-step').innerHTML = langData.incompatiblesStep;
       document.getElementById('generate-button').innerHTML = langData.generateButton;
       document.getElementById('export-teams').innerHTML = langData.exportTeams;
       document.getElementById('go-to-geco').innerText = langData.goToGeco;
 
       const footerParas = document.querySelectorAll('footer p');
-      if (footerParas[0]) footerParas[0].innerHTML = langData.labText;
-      if (footerParas[1]) footerParas[1].innerHTML = langData.authorText;
-      if (footerParas[2]) footerParas[2].innerHTML = langData.licenseText;
+      if (footerParas[0]) footerParas[0].innerHTML = langData.footerLab;
+      if (footerParas[1]) footerParas[1].innerHTML = langData.footerAuthor;
+      if (footerParas[2]) footerParas[2].innerHTML = langData.footerLicense;
     }
 
     function setLanguage(lang) {
-      if (!translations[lang]) {
+      if (!TRANSLATIONS[lang]) {
         lang = DEFAULT_LANGUAGE;
       }
       currentLanguage = lang;
@@ -566,7 +365,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const savedLang = localStorage.getItem('preferredLanguage');
-      const initialLang = (savedLang && translations[savedLang]) ? savedLang : detectBrowserLanguage();
+      const initialLang = (savedLang && TRANSLATIONS[savedLang]) ? savedLang : detectBrowserLanguage();
       currentLanguage = initialLang;
       buildLanguageSwitcher();
       applyTranslations();

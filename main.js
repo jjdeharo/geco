@@ -328,8 +328,35 @@ function showQuickPasteStatus(messageKey, params = {}, type = 'info') {
   if (type === 'error') el.classList.add('error');
 }
 
+function bindClick(id, handler) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.addEventListener('click', handler);
+  }
+}
+
+function clearResultsAndReport() {
+  const resultadosDiv = document.getElementById('resultados');
+  if (resultadosDiv) {
+    resultadosDiv.innerHTML = '';
+  }
+  const reportDiv = document.getElementById('report');
+  if (reportDiv) {
+    reportDiv.innerHTML = '';
+  }
+}
+
+function renderCurrentReport() {
+  if (lastReportData) {
+    const { equipos, tipoGrupo, numAlumnos, opcionSobrantes } = lastReportData;
+    mostrarInforme(cloneEquipos(equipos), tipoGrupo, numAlumnos, opcionSobrantes);
+    return;
+  }
+  mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
+}
+
 function refreshBodyModalState() {
-  if (isTypologyModalOpen || isImportModalOpen) {
+  if (isTypologyModalOpen || isImportModalOpen || isFullImportModalOpen) {
     document.body.classList.add('modal-open');
   } else {
     document.body.classList.remove('modal-open');
@@ -593,21 +620,14 @@ function replaceStudentAssignments(assignments) {
   incompatibleGroups = [];
   refreshIncompatiblesUI();
   renderAssignmentsTable();
-  const resultadosDiv = document.getElementById('resultados');
-  if (resultadosDiv) {
-    resultadosDiv.innerHTML = '';
-  }
-  const reportDiv = document.getElementById('report');
-  if (reportDiv) {
-    reportDiv.innerHTML = '';
-  }
+  clearResultsAndReport();
   const successMsg = document.getElementById('copySuccess');
   if (successMsg) {
     successMsg.textContent = '';
     successMsg.classList.remove('show');
   }
   lastReportData = null;
-  mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
+  renderCurrentReport();
   saveAppState();
 }
 
@@ -1003,31 +1023,11 @@ function getAllStudentsArray() {
   return [...grupoA, ...grupoB, ...grupoC];
 }
 
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
-function etiquetarAlumnos(lista, tipo) {
-  return lista.map(nombre => ({ nombre, tipo }));
-}
+const teamEngine = typeof window !== 'undefined' ? window.GecoTeamEngine : null;
+const reportEngine = typeof window !== 'undefined' ? window.GecoReportEngine : null;
 
 function calculateMaxGroups(totalStudents, membersPerGroup, leftoversOption) {
-  if (!membersPerGroup || membersPerGroup <= 0 || totalStudents <= 0) {
-    return 0;
-  }
-  const baseGroups = Math.floor(totalStudents / membersPerGroup);
-  const remainder = totalStudents % membersPerGroup;
-  if (baseGroups === 0 && remainder > 0) {
-    return 1;
-  }
-  if (remainder > 0 && leftoversOption === 'grupoNuevo') {
-    return baseGroups + 1;
-  }
-  return baseGroups > 0 ? baseGroups : (remainder > 0 ? 1 : 0);
+  return teamEngine.calculateMaxGroups(totalStudents, membersPerGroup, leftoversOption);
 }
 
 function getIncompatibleNamesSet() {
@@ -1234,12 +1234,7 @@ function setLanguage(lang) {
   if (isTypologyModalOpen) {
     focusFirstTypologyField();
   }
-  if (lastReportData) {
-    const { equipos, tipoGrupo, numAlumnos, opcionSobrantes } = lastReportData;
-    mostrarInforme(cloneEquipos(equipos), tipoGrupo, numAlumnos, opcionSobrantes);
-  } else {
-    mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
-  }
+  renderCurrentReport();
 }
 
 function clearAllNames() {
@@ -1260,7 +1255,7 @@ function clearAllNames() {
     successMsg.classList.remove('show');
   }
   lastReportData = null;
-  mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
+  renderCurrentReport();
 }
 
 function updateInfoGrupos() {
@@ -1332,275 +1327,6 @@ function initNumberSelector() {
   });
 }
 
-function preAsignarIncompatibles(grupos, incompatSets, numAlumnos) {
-  if (grupos.length === 0 && incompatSets.length > 0) {
-    grupos.push([]);
-  }
-  incompatSets.forEach(set => {
-    const nombresSet = new Set(set.map(alumno => alumno.nombre));
-    set.forEach(alumno => {
-      let asignado = false;
-      for (let i = 0; i < grupos.length; i++) {
-        const grupo = grupos[i];
-        if (grupo.length >= numAlumnos) continue;
-        const conflicto = grupo.some(miembro => nombresSet.has(miembro.nombre));
-        if (!conflicto) {
-          grupo.push(alumno);
-          asignado = true;
-          break;
-        }
-      }
-      if (!asignado) {
-        grupos.push([alumno]);
-      }
-    });
-  });
-}
-
-function distribuirAlumnosPorGrupo(alumnos, grupos, numAlumnos, sobrantes) {
-  if (grupos.length === 0) {
-    sobrantes.push(...alumnos);
-    return;
-  }
-  let indicePreferente = 0;
-  alumnos.forEach(alumno => {
-    let colocado = false;
-    for (let i = 0; i < grupos.length; i++) {
-      const indice = (indicePreferente + i) % grupos.length;
-      if (grupos[indice].length < numAlumnos) {
-        grupos[indice].push(alumno);
-        indicePreferente = indice + 1;
-        colocado = true;
-        break;
-      }
-    }
-    if (!colocado) {
-      sobrantes.push(alumno);
-    }
-  });
-}
-
-function balancearGruposHeterogeneos(grupos, incompatiblesSet) {
-  grupos.forEach((grupo, indiceGrupo) => {
-    const tieneA = grupo.some(alumno => alumno.tipo === 'A');
-    const tieneC = grupo.some(alumno => alumno.tipo === 'C');
-    if (tieneA || tieneC) return;
-    const indiceBDisponible = grupo.findIndex(alumno => alumno.tipo === 'B' && !incompatiblesSet.has(alumno.nombre));
-    if (indiceBDisponible === -1) return;
-    for (let j = 0; j < grupos.length; j++) {
-      if (j === indiceGrupo) continue;
-      const grupoDonante = grupos[j];
-      const indiceA = grupoDonante.findIndex(alumno => alumno.tipo === 'A' && !incompatiblesSet.has(alumno.nombre));
-      if (indiceA !== -1) {
-        const intercambio = grupoDonante[indiceA];
-        grupoDonante[indiceA] = grupo[indiceBDisponible];
-        grupo[indiceBDisponible] = intercambio;
-        return;
-      }
-      const indiceC = grupoDonante.findIndex(alumno => alumno.tipo === 'C' && !incompatiblesSet.has(alumno.nombre));
-      if (indiceC !== -1) {
-        const intercambio = grupoDonante[indiceC];
-        grupoDonante[indiceC] = grupo[indiceBDisponible];
-        grupo[indiceBDisponible] = intercambio;
-        return;
-      }
-    }
-  });
-}
-
-function manejarSobrantes(grupos, opcion, numAlumnos, sobrantes) {
-  if (!sobrantes || sobrantes.length === 0) {
-    return grupos;
-  }
-  if (opcion === 'grupoNuevo') {
-    grupos.push([...sobrantes]);
-    return grupos;
-  }
-  if (grupos.length === 0) {
-    grupos.push([]);
-  }
-  let indicePreferente = 0;
-  sobrantes.forEach(alumno => {
-    let colocado = false;
-    for (let i = 0; i < grupos.length; i++) {
-      const indice = (indicePreferente + i) % grupos.length;
-      if (grupos[indice].length < numAlumnos) {
-        grupos[indice].push(alumno);
-        indicePreferente = indice + 1;
-        colocado = true;
-        break;
-      }
-    }
-    if (!colocado) {
-      let indiceMin = 0;
-      let longitudMin = grupos[0].length;
-      for (let i = 1; i < grupos.length; i++) {
-        if (grupos[i].length < longitudMin) {
-          longitudMin = grupos[i].length;
-          indiceMin = i;
-        }
-      }
-      grupos[indiceMin].push(alumno);
-      indicePreferente = indiceMin + 1;
-    }
-  });
-  return grupos;
-}
-
-function distribuirHomogeneosPorTipo(alumnos, grupos, numAlumnos, sobrantes, tipo) {
-  alumnos.forEach(alumno => {
-    let colocado = false;
-    for (let i = 0; i < grupos.length; i++) {
-      const grupo = grupos[i];
-      if (grupo.length >= numAlumnos) continue;
-      const mezcla = grupo.some(miembro => miembro.tipo !== tipo);
-      if (!mezcla) {
-        grupo.push(alumno);
-        colocado = true;
-        break;
-      }
-    }
-    if (!colocado) {
-      grupos.push([alumno]);
-    }
-  });
-  grupos.forEach(grupo => {
-    while (grupo.length > numAlumnos) {
-      sobrantes.push(grupo.pop());
-    }
-  });
-}
-
-function agruparSobrantesHomogeneos(sobrantes, numAlumnos) {
-  if (sobrantes.length === 0) return [];
-  const copia = [...sobrantes];
-  const grupos = [];
-  while (copia.length > 0) {
-    const size = Math.min(numAlumnos, copia.length);
-    grupos.push(copia.splice(0, size));
-  }
-  for (let i = grupos.length - 1; i >= 0; i--) {
-    if (grupos[i].length === 1 && grupos.length > 1) {
-      const donante = grupos.find(g => g.length > 2);
-      if (donante) {
-        grupos[i].push(donante.pop());
-      } else if (i > 0) {
-        grupos[i - 1].push(grupos[i][0]);
-        grupos.splice(i, 1);
-      }
-    }
-  }
-  return grupos;
-}
-
-function tipoPredominante(grupo) {
-  const contador = grupo.reduce((acc, alumno) => {
-    acc[alumno.tipo] = (acc[alumno.tipo] || 0) + 1;
-    return acc;
-  }, {});
-  let mejorTipo = null;
-  let mejorConteo = -1;
-  Object.entries(contador).forEach(([tipo, conteo]) => {
-    if (conteo > mejorConteo) {
-      mejorTipo = tipo;
-      mejorConteo = conteo;
-    }
-  });
-  return mejorTipo;
-}
-
-function agregarSobrantesHomogeneos(grupos, alumnos) {
-  alumnos.forEach(alumno => {
-    const preferencias = alumno.tipo === 'A'
-      ? ['B', 'A', 'C']
-      : alumno.tipo === 'C'
-        ? ['B', 'C', 'A']
-        : ['A', 'C', 'B'];
-    let destino = null;
-    for (const pref of preferencias) {
-      destino = grupos.find(grupo => tipoPredominante(grupo) === pref);
-      if (destino) break;
-    }
-    if (!destino) {
-      destino = grupos[0];
-    }
-    if (destino) {
-      destino.push(alumno);
-    } else {
-      grupos.push([alumno]);
-    }
-  });
-}
-
-function fusionarGruposUnitarios(grupos, numAlumnos) {
-  for (let i = grupos.length - 1; i >= 0; i--) {
-    if (grupos[i].length === 1) {
-      const alumno = grupos[i][0];
-      grupos.splice(i, 1);
-      agregarSobrantesHomogeneos(grupos, [alumno]);
-    }
-  }
-}
-
-function generarGruposHeterogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, totalAlumnosOriginal, opcionSobrantes) {
-  let numGrupos = Math.floor(totalAlumnosOriginal / numAlumnos);
-  if (numGrupos === 0 && totalAlumnosOriginal > 0) {
-    numGrupos = 1;
-  }
-  const grupos = Array.from({ length: numGrupos }, () => []);
-  const sobrantes = [];
-  preAsignarIncompatibles(grupos, incompatSets, numAlumnos);
-  distribuirAlumnosPorGrupo(listaA, grupos, numAlumnos, sobrantes);
-  distribuirAlumnosPorGrupo(listaC, grupos, numAlumnos, sobrantes);
-  distribuirAlumnosPorGrupo(listaB, grupos, numAlumnos, sobrantes);
-  const incompatiblesSet = new Set(incompatSets.flat().map(alumno => alumno.nombre));
-  balancearGruposHeterogeneos(grupos, incompatiblesSet);
-  if (grupos.length > numGrupos) {
-    const extras = grupos.splice(numGrupos);
-    extras.flat().forEach(alumno => sobrantes.push(alumno));
-  }
-  return { grupos, sobrantes };
-}
-
-function generarGruposHomogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, totalAlumnosOriginal, opcionSobrantes) {
-  let numGrupos = Math.floor(totalAlumnosOriginal / numAlumnos);
-  if (numGrupos === 0 && totalAlumnosOriginal > 0) {
-    numGrupos = 1;
-  }
-  const grupos = Array.from({ length: numGrupos }, () => []);
-  const sobrantes = [];
-  preAsignarIncompatibles(grupos, incompatSets, numAlumnos);
-  distribuirHomogeneosPorTipo(listaA, grupos, numAlumnos, sobrantes, 'A');
-  distribuirHomogeneosPorTipo(listaB, grupos, numAlumnos, sobrantes, 'B');
-  distribuirHomogeneosPorTipo(listaC, grupos, numAlumnos, sobrantes, 'C');
-  const gruposSobrantes = agruparSobrantesHomogeneos(sobrantes, numAlumnos);
-  if (opcionSobrantes === 'agregar') {
-    agregarSobrantesHomogeneos(grupos, gruposSobrantes.flat());
-    fusionarGruposUnitarios(grupos, numAlumnos);
-    return { grupos, sobrantes: [] };
-  }
-  if (gruposSobrantes.length === 1 && gruposSobrantes[0].length === 1 && grupos.length > 0) {
-    agregarSobrantesHomogeneos(grupos, gruposSobrantes[0]);
-  } else {
-    gruposSobrantes.forEach(grupo => grupos.push(grupo));
-  }
-  fusionarGruposUnitarios(grupos, numAlumnos);
-  return { grupos, sobrantes: [] };
-}
-
-function generarGruposEsporadicos(listaRestante, numAlumnos, incompatSets, totalAlumnosOriginal) {
-  let numGrupos = Math.floor(totalAlumnosOriginal / numAlumnos);
-  if (numGrupos === 0 && totalAlumnosOriginal > 0) {
-    numGrupos = 1;
-  }
-  const grupos = Array.from({ length: numGrupos }, () => []);
-  const sobrantes = [];
-  preAsignarIncompatibles(grupos, incompatSets, numAlumnos);
-  const mezcla = shuffleArray([...listaRestante]);
-  distribuirAlumnosPorGrupo(mezcla, grupos, numAlumnos, sobrantes);
-  return { grupos, sobrantes };
-}
-
 function generarEquipos() {
   const { grupoA, grupoB, grupoC } = getStudentLists();
   const numAlumnos = parseInt(document.getElementById('numAlumnos').value, 10) || 0;
@@ -1625,38 +1351,16 @@ function generarEquipos() {
     alert(t('incompatiblesWarning'));
     return null;
   }
-  let listaAlumnosA = shuffleArray(etiquetarAlumnos(grupoA, 'A'));
-  let listaAlumnosB = shuffleArray(etiquetarAlumnos(grupoB, 'B'));
-  let listaAlumnosC = shuffleArray(etiquetarAlumnos(grupoC, 'C'));
-  const mapaAlumnos = new Map([
-    ...listaAlumnosA.map(alumno => [alumno.nombre, alumno]),
-    ...listaAlumnosB.map(alumno => [alumno.nombre, alumno]),
-    ...listaAlumnosC.map(alumno => [alumno.nombre, alumno])
-  ]);
-  const incompatSets = incompatibleGroups
-    .map(grupo => grupo.map(nombre => mapaAlumnos.get(nombre)).filter(Boolean))
-    .filter(grupo => grupo.length >= 2);
-  const nombresIncompatibles = new Set(incompatSets.flat().map(alumno => alumno.nombre));
-  listaAlumnosA = listaAlumnosA.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
-  listaAlumnosB = listaAlumnosB.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
-  listaAlumnosC = listaAlumnosC.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
-  const totalOriginal = totalAlumnos;
-  let resultado;
-  if (tipoGrupo === 'heterogeneos') {
-    resultado = generarGruposHeterogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, totalOriginal, opcionSobrantes);
-  } else if (tipoGrupo === 'homogeneos') {
-    resultado = generarGruposHomogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, totalOriginal, opcionSobrantes);
-  } else {
-    const combinados = [...listaAlumnosA, ...listaAlumnosB, ...listaAlumnosC];
-    resultado = generarGruposEsporadicos(combinados, numAlumnos, incompatSets, totalOriginal);
-  }
-  if (!resultado) {
-    return null;
-  }
-  if (tipoGrupo === 'homogeneos') {
-    return resultado.grupos;
-  }
-  return manejarSobrantes(resultado.grupos, opcionSobrantes, numAlumnos, resultado.sobrantes);
+  const result = teamEngine.generateTeams({
+    grupoA,
+    grupoB,
+    grupoC,
+    numAlumnos,
+    tipoGrupo,
+    opcionSobrantes,
+    incompatibleGroups
+  });
+  return result.teams;
 }
 
 function generarYMostrarEquipos() {
@@ -1696,7 +1400,7 @@ function mostrarEquipos(equipos) {
     const cellMiembros = row.insertCell();
     cellMiembros.style.padding = '10px';
     cellMiembros.style.borderBottom = '1px solid #ddd';
-    cellNum.textContent = `${t('teamLabel', { index: index + 1 })}:`;
+    cellNum.textContent = `${t('teamLabel', { index: index + 1 })} (${equipo.length}):`;
     const miembrosTexto = equipo
       .map(alumno => `(${alumno.tipo}) ${alumno.nombre}`)
       .sort((a, b) => a.localeCompare(b, locale, { sensitivity: 'base' }))
@@ -1789,83 +1493,6 @@ function downloadTeamsAsCsv(equipos) {
   URL.revokeObjectURL(url);
 }
 
-function analizarEquipos(equipos, tipoGrupo, numAlumnos, opcionSobrantes) {
-  const analysis = {
-    status: 'ok',
-    messages: []
-  };
-
-  const registrar = (nivel, clave, parametros = {}) => {
-    analysis.messages.push(t(`report.messages.${clave}`, parametros));
-    if (nivel === 'error') {
-      analysis.status = 'fail';
-    } else if (nivel === 'warning' && analysis.status !== 'fail') {
-      analysis.status = 'partial';
-    }
-  };
-
-  const nameToTeam = new Map();
-  equipos.forEach((grupo, index) => {
-    grupo.forEach(alumno => {
-      nameToTeam.set(alumno.nombre, index + 1);
-    });
-  });
-
-  incompatibleGroups.forEach(grupo => {
-    const contador = {};
-    grupo.forEach(nombre => {
-      const equipo = nameToTeam.get(nombre);
-      if (equipo !== undefined) {
-        contador[equipo] = (contador[equipo] || 0) + 1;
-      }
-    });
-    Object.entries(contador).forEach(([equipo, cuenta]) => {
-      if (cuenta > 1) {
-        registrar('error', 'incompatibles', { names: grupo.join(', '), team: equipo });
-      }
-    });
-  });
-
-  const totalStudents = equipos.reduce((acc, grupo) => acc + grupo.length, 0);
-  if (numAlumnos > 0) {
-    const baseExpected = Math.floor(totalStudents / numAlumnos);
-    const remainder = totalStudents % numAlumnos;
-    const expected = opcionSobrantes === 'grupoNuevo' && remainder > 0 ? baseExpected + 1 : baseExpected;
-    if (tipoGrupo !== 'homogeneos' && opcionSobrantes === 'agregar' && equipos.length !== baseExpected) {
-      registrar('warning', 'groupCountDifferent', { current: equipos.length, expected: baseExpected });
-    } else if (tipoGrupo !== 'homogeneos' && opcionSobrantes === 'grupoNuevo' && equipos.length > expected) {
-      registrar('warning', 'groupCountDifferent', { current: equipos.length, expected });
-    }
-  }
-
-  equipos.forEach((grupo, index) => {
-    const size = grupo.length;
-    if (size === 1) {
-      registrar('warning', 'groupSingle', { team: index + 1 });
-    }
-    if (tipoGrupo !== 'esporadicos' && numAlumnos > 0 && size !== numAlumnos) {
-      registrar('warning', 'sizeDifferent', { team: index + 1, size, target: numAlumnos });
-    }
-    if (tipoGrupo === 'heterogeneos') {
-      const tieneClave = grupo.some(alumno => alumno.tipo === 'A' || alumno.tipo === 'C');
-      if (!tieneClave) {
-        registrar('warning', 'heteroNoAC', { team: index + 1 });
-      }
-    }
-    if (tipoGrupo === 'homogeneos') {
-      const tipos = new Set(grupo.map(alumno => alumno.tipo));
-      if (tipos.size > 1) {
-        registrar('warning', 'homoMixed', { team: index + 1, types: Array.from(tipos).join(', ') });
-      }
-    }
-    if (tipoGrupo === 'esporadicos' && numAlumnos > 0 && Math.abs(size - numAlumnos) > 1) {
-      registrar('warning', 'randomSize', { team: index + 1, size, target: numAlumnos });
-    }
-  });
-
-  return analysis;
-}
-
 function mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes) {
   const container = document.getElementById('report');
   if (!container) return;
@@ -1879,6 +1506,25 @@ function mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes) {
   mode.textContent = t(`report.modeLabel.${tipoGrupo}`);
   container.appendChild(mode);
 
+  const criteria = document.createElement('details');
+  criteria.className = 'report-criteria';
+  const criteriaSummary = document.createElement('summary');
+  criteriaSummary.textContent = t('report.criteria.title');
+  criteria.appendChild(criteriaSummary);
+  const criteriaList = document.createElement('ul');
+  reportEngine.buildReportCriteria({
+    tipoGrupo,
+    numAlumnos,
+    opcionSobrantes,
+    translate: t
+  }).forEach(text => {
+    const item = document.createElement('li');
+    item.textContent = text;
+    criteriaList.appendChild(item);
+  });
+  criteria.appendChild(criteriaList);
+  container.appendChild(criteria);
+
   if (!equipos || equipos.length === 0) {
     const info = document.createElement('p');
     info.textContent = t('report.noTeams');
@@ -1886,7 +1532,14 @@ function mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes) {
     return;
   }
 
-  const analysis = analizarEquipos(equipos, tipoGrupo, numAlumnos, opcionSobrantes);
+  const analysis = reportEngine.analyzeTeams({
+    equipos,
+    tipoGrupo,
+    numAlumnos,
+    opcionSobrantes,
+    incompatibleGroups,
+    translate: t
+  });
 
   const status = document.createElement('p');
   status.className = `report-status ${analysis.status}`;
@@ -1910,7 +1563,7 @@ function mostrarInforme(equipos, tipoGrupo, numAlumnos, opcionSobrantes) {
 }
 
 function resetApplication() {
-  try { localStorage.clear(); } catch (e) {}
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
   incompatibleGroups = [];
   lastReportData = null;
   // Rellenar con ejemplos según el idioma actual
@@ -1924,20 +1577,20 @@ function resetApplication() {
   // Sincroniza estructuras y UI
   updateAssignmentsFromTextareas();
   clearIncompatibleGroups();
-  const resultadosDiv = document.getElementById('resultados');
-  if (resultadosDiv) resultadosDiv.innerHTML = '';
-  const reportDiv = document.getElementById('report');
-  if (reportDiv) reportDiv.innerHTML = '';
+  clearResultsAndReport();
   showImportStatus(null);
   showFullImportStatus('');
   showQuickPasteStatus(null);
   updateInfoGrupos();
   refreshIncompatiblesUI();
-  mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
+  renderCurrentReport();
   saveAppState();
 }
 
 function initialise() {
+  if (!teamEngine || !reportEngine) {
+    throw new Error('GeCo runtime modules failed to load');
+  }
   setupSampleNamesMetadata();
   const savedLang = localStorage.getItem('preferredLanguage');
   const initialLang = savedLang || detectBrowserLanguage();
@@ -1950,38 +1603,35 @@ function initialise() {
   initFullImport();
   initTypologyModal();
   renderAssignmentsTable();
-  document.getElementById('grupoA').addEventListener('input', handleNamesInput);
-  document.getElementById('grupoB').addEventListener('input', handleNamesInput);
-  document.getElementById('grupoC').addEventListener('input', handleNamesInput);
-  document.getElementById('addIncompatibleBtn').addEventListener('click', addIncompatibleGroup);
-  document.getElementById('clearIncompatiblesBtn').addEventListener('click', clearIncompatibleGroups);
+  ['grupoA', 'grupoB', 'grupoC'].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('input', handleNamesInput);
+    }
+  });
+  bindClick('addIncompatibleBtn', addIncompatibleGroup);
+  bindClick('clearIncompatiblesBtn', clearIncompatibleGroups);
   document.querySelectorAll('input[name="sobrantes"]').forEach(radio => {
     radio.addEventListener('change', () => { refreshIncompatiblesUI(); saveAppState(); });
   });
   document.querySelectorAll('input[name="tipoGrupo"]').forEach(radio => {
-    radio.addEventListener('change', () => { saveAppState(); if (lastReportData) mostrarInforme(lastReportData.equipos, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes()); });
+    radio.addEventListener('change', () => { saveAppState(); if (lastReportData) renderCurrentReport(); });
   });
-  document.getElementById('generarGrupos').addEventListener('click', generarYMostrarEquipos);
-  document.getElementById('clearAllBtn').addEventListener('click', clearAllNames);
-  const exportAllBtn = document.getElementById('exportAllBtn');
-  if (exportAllBtn) exportAllBtn.addEventListener('click', exportAllData);
-  const exportAllBtn2 = document.getElementById('exportAllBtn2');
-  if (exportAllBtn2) exportAllBtn2.addEventListener('click', exportAllData);
-  const openFullImportBtn = document.getElementById('openFullImportBtn');
-  if (openFullImportBtn) openFullImportBtn.addEventListener('click', openFullImportModal);
-  const openFullImportBtn2 = document.getElementById('openFullImportBtn2');
-  if (openFullImportBtn2) openFullImportBtn2.addEventListener('click', openFullImportModal);
+  bindClick('generarGrupos', generarYMostrarEquipos);
+  bindClick('clearAllBtn', clearAllNames);
+  bindClick('exportAllBtn', exportAllData);
+  bindClick('exportAllBtn2', exportAllData);
+  bindClick('openFullImportBtn2', openFullImportModal);
   const quickPasteBtn = document.getElementById('quickPasteBtn');
   if (quickPasteBtn) quickPasteBtn.addEventListener('click', () => {
     const area = document.getElementById('quickPasteNames');
     const count = addStudentsFromNamesOnly(area ? area.value : '');
     if (count !== null && area) area.value = '';
   });
-  const resetBtn = document.getElementById('resetAppBtn');
-  if (resetBtn) resetBtn.addEventListener('click', resetApplication);
+  bindClick('resetAppBtn', resetApplication);
   updateInfoGrupos();
   refreshIncompatiblesUI();
-  mostrarInforme(null, getCurrentTipoGrupo(), getCurrentNumAlumnos(), getCurrentSobrantes());
+  renderCurrentReport();
 }
 
 document.addEventListener('DOMContentLoaded', initialise);
