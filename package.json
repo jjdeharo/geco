@@ -27,6 +27,7 @@
     },
     "asar": true,
     "files": [
+      "analytics.js",
       "index.html",
       "instr.html",
       "main.js",

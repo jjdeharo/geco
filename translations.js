@@ -142,7 +142,12 @@ const TRANSLATIONS = {
       heading: 'Generador de equipos cooperativos',
       meta: "© 2025–2026 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
       code: "El código de esta aplicación está disponible bajo licencia <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a>.",
-      content: "Los contenidos educativos (textos, ejercicios, vídeos e imágenes) están bajo licencia <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>."
+      content: "Los contenidos educativos (textos, ejercicios, vídeos e imágenes) están bajo licencia <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>.",
+      analyticsNotice: 'Esta aplicación recoge únicamente estadísticas de uso agregadas con un sistema propio para conocer su utilización y mejorar la herramienta. No se almacenan direcciones IP ni se usan cookies de analítica para los visitantes.',
+      analytics: {
+        visits: 'Visitas',
+        today: 'Hoy'
+      }
     },
     report: {
       title: 'Informe de equipos',
@@ -335,7 +340,12 @@ const TRANSLATIONS = {
       heading: "Generador d'equips cooperatius",
       meta: "© 2025–2026 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
       code: "El codi d'aquesta aplicació està disponible amb llicència <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a>.",
-      content: "Els continguts educatius (textos, exercicis, vídeos i imatges) estan sota llicència <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>."
+      content: "Els continguts educatius (textos, exercicis, vídeos i imatges) estan sota llicència <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>.",
+      analyticsNotice: 'Aquesta aplicació recull únicament estadístiques d’ús agregades amb un sistema propi per conèixer la seva utilització i millorar l’eina. No s’emmagatzemen adreces IP ni s’utilitzen cookies d’analítica per als visitants.',
+      analytics: {
+        visits: 'Visites',
+        today: 'Avui'
+      }
     },
     report: {
       title: "Informe d'equips",
@@ -525,7 +535,12 @@ const TRANSLATIONS = {
       heading: 'Cooperative Team Generator',
       meta: "© 2025–2026 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
       code: "The source code is released under the <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a> license.",
-      content: "Educational content (text, exercises, videos and images) is licensed under <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>."
+      content: "Educational content (text, exercises, videos and images) is licensed under <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>.",
+      analyticsNotice: 'This application only collects aggregated usage statistics through an in-house system to understand how it is used and improve the tool. No IP addresses are stored and no analytics cookies are used for visitors.',
+      analytics: {
+        visits: 'Visits',
+        today: 'Today'
+      }
     },
     report: {
       title: 'Team report',
@@ -715,7 +730,12 @@ const TRANSLATIONS = {
       heading: 'Xerador de equipos cooperativos',
       meta: "© 2025–2026 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
       code: "O código desta aplicación publícase baixo licenza <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a>.",
-      content: "Os contidos educativos (textos, exercicios, vídeos e imaxes) están baixo licenza <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>."
+      content: "Os contidos educativos (textos, exercicios, vídeos e imaxes) están baixo licenza <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a>.",
+      analyticsNotice: 'Esta aplicación recolle unicamente estatísticas de uso agregadas cun sistema propio para coñecer a súa utilización e mellorar a ferramenta. Non se almacenan enderezos IP nin se usan cookies de analítica para as persoas visitantes.',
+      analytics: {
+        visits: 'Visitas',
+        today: 'Hoxe'
+      }
     },
     report: {
       title: 'Informe de equipos',
@@ -905,7 +925,12 @@ const TRANSLATIONS = {
       heading: 'Talde kooperatiboen sortzailea',
       meta: "© 2025–2026 · <a href='https://bilateria.org' rel='author'>Juan José de Haro</a> · <a href='https://github.com/jjdeharo/geco'>https://github.com/jjdeharo/geco</a>",
       code: "Aplikazio honen kodea <a rel='license' href='https://www.gnu.org/licenses/agpl-3.0.html'>AGPL v3</a> lizentziapean argitaratua dago.",
-      content: "Eduki didaktikoak (testuak, ariketak, bideoak eta irudiak) <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a> lizentziapean daude."
+      content: "Eduki didaktikoak (testuak, ariketak, bideoak eta irudiak) <a rel='license' href='https://creativecommons.org/licenses/by-sa/4.0/'>CC BY-SA 4.0</a> lizentziapean daude.",
+      analyticsNotice: 'Aplikazio honek erabilera-estatistika agregatuak baino ez ditu jasotzen sistema propio baten bidez, haren erabilera ezagutzeko eta tresna hobetzeko. Ez dira IP helbideak gordetzen eta ez da analitika-cookie-rik erabiltzen bisitarientzat.',
+      analytics: {
+        visits: 'Bisitak',
+        today: 'Gaur'
+      }
     },
     report: {
       title: 'Talde txostena',

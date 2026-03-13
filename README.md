@@ -8,6 +8,7 @@ GeCo es una aplicación web pensada para docentes de ESO y Bachillerato que nece
 - **Gestión de sobrantes**: opción entre crear un equipo nuevo o repartir el exceso entre los equipos existentes.
 - **Informe pedagógico** tras cada generación que avisa de desviaciones respecto al diseño previsto.
 - **Internacionalización**: interfaz disponible en español, catalán, gallego, euskera e inglés.
+- **Estadísticas de uso agregadas** en la versión web pública mediante un sistema propio, sin cookies analíticas ni almacenamiento de IPs.
 
 ## Uso rápido
 1. Abre `index.html` en un navegador moderno.
@@ -28,6 +29,7 @@ Para más detalles didácticos consulta `instr.html`.
 ## Arquitectura actual
 - La interfaz principal vive en `index.html`.
 - La lógica activa del navegador está en `main.js`.
+- El contador público de uso agregado está en `analytics.js`.
 - Las cadenas de la interfaz están centralizadas en `translations.js`.
 - La guía para el usuario está en `instr.html`.
 
