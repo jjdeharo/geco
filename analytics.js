@@ -55,29 +55,6 @@
     }
   }
 
-  function updateAnalyticsSummary(payload, config) {
-    const summary = document.querySelector('[data-analytics-summary]');
-    const totalNode = document.querySelector('[data-analytics-total]');
-    const todayNode = document.querySelector('[data-analytics-today]');
-    const linkNode = document.querySelector('[data-analytics-link]');
-    const total = Number.parseInt(String(payload && payload.total !== undefined ? payload.total : ''), 10);
-    const today = Number.parseInt(String(payload && payload.today !== undefined ? payload.today : ''), 10);
-
-    if (!summary || !totalNode || !todayNode) {
-      return;
-    }
-    if (!Number.isFinite(total) || !Number.isFinite(today)) {
-      return;
-    }
-
-    totalNode.textContent = String(total);
-    todayNode.textContent = String(today);
-    if (linkNode && config.statsUrl) {
-      linkNode.href = config.statsUrl;
-    }
-    summary.hidden = false;
-  }
-
   function requestAnalytics() {
     if (!shouldTrackAnalytics()) {
       return;
@@ -131,7 +108,6 @@
 
     window[callbackName] = function (payload) {
       try {
-        updateAnalyticsSummary(payload || {}, config);
         if (countVisit && payload && payload.ok) {
           rememberVisit(config.siteId);
         }
@@ -152,15 +128,22 @@
       window.setTimeout(requestAnalytics, 0);
     };
 
-    if (typeof window.requestIdleCallback === 'function') {
-      window.requestIdleCallback(run, { timeout: 2500 });
-      return;
-    }
+    // Un <script async> inyectado antes de que se dispare «load» retrasa ese
+    // evento hasta que la peticion termina. Si el servidor de estadisticas se
+    // cuelga, «load» no llegaria a dispararse nunca. Por eso se espera siempre
+    // a «load» antes de programar nada.
+    const programar = function () {
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(run, { timeout: 2500 });
+      } else {
+        window.setTimeout(run, 0);
+      }
+    };
     if (document.readyState === 'complete') {
-      run();
+      programar();
       return;
     }
-    window.addEventListener('load', run, { once: true });
+    window.addEventListener('load', programar, { once: true });
   }
 
   initAnalytics();
