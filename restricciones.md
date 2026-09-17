@@ -10,24 +10,25 @@
 ## Equipos heterogéneos
 - **Descripción:** busca equipos mixtos con al menos una persona autónoma (A) o con alta necesidad (C) y se completan con alumnado B. Es la opción recomendada para equilibrio de roles.
 - **Cómo se construyen:**
-  - Se calcula el número máximo de equipos completos según el tamaño solicitado.
-  - Se reparten primero A y C (al azar) para garantizar diversidad y, después, se completan con B.
-  - Si algún equipo queda sin A ni C y otros tienen más de uno, se intercambian miembros para equilibrar.
-  - Las incompatibilidades se asignan antes de estos repartos.
+  - Se calcula de antemano cuántos equipos habrá y el tamaño de cada uno, incluido el equipo de sobrantes (ver «Sobrantes»).
+  - Se reparten primero A y C (al azar) entre todos los equipos, también el de sobrantes, para garantizar diversidad y, después, se completan con B.
+  - Si algún equipo queda sin A ni C y otro tiene al menos dos, se intercambian miembros para equilibrar.
+  - Las incompatibilidades se asignan antes de estos repartos y los intercambios nunca mueven a personas incompatibles.
 - **Cuándo se viola la descripción:**
   - Si hay menos A o C que equipos, algunos grupos pueden quedar solo con alumnado B después de los intercambios; es la única forma de cubrir todas las plazas.
   - Si el número de alumnos no es múltiplo del tamaño objetivo, habrá equipos con un miembro extra o con uno menos según la política de sobrantes.
 - **Sobrantes:**
-  - `Crear un equipo nuevo`: se agrupan entre sí intentando respetar el tamaño objetivo; si no alcanza, se fusionan para evitar equipos unitarios.
-  - `Agregar a otros equipos`: se reparten buscando mantener tamaños similares; si todos los equipos están llenos, se inserta en el equipo con menor tamaño.
+  - `Crear un equipo nuevo`: los sobrantes forman un equipo más pequeño. Si sobra una sola persona, otro equipo le cede un miembro (por ejemplo, 25 personas en equipos de 4 dan 4, 4, 4, 4, 4, 3 y 2). Con equipos de 2 no es posible ceder a nadie, así que la persona sobrante se une a un equipo, que queda de 3.
+  - `Agregar a otros equipos`: se reparten de uno en uno entre los equipos existentes, de modo que ningún equipo recibe dos sobrantes mientras otro no haya recibido ninguno.
 
 ## Equipos homogéneos
 - **Descripción:** forma equipos de alumnado con la misma tipología (todos A, todos B o todos C). Resulta útil para tareas diferenciadas.
 - **Cómo se construyen:**
-  - Se calculan los equipos completos por tipología y se asignan de forma aleatoria dentro de cada tipo.
-  - Las personas incompatibles se colocan antes que el resto y se reparte el alumnado de su tipología alrededor de ellas.
-  - Los sobrantes de cada tipología se agrupan en bloques procurando que ninguno quede solo. Si aún sobra una persona, se une al grupo más compatible.
-  - Si la opción es `Agregar a otros equipos`, los sobrantes se insertan con preferencias: A → equipos con mayoría B, C → mayoría B, B → mayoría A o C. Tras el reparto se verifican equipos unitarios y, si existen, se fusionan.
+  - Cada tipología se reparte por separado en equipos del tamaño solicitado, de forma aleatoria dentro de cada tipo.
+  - Los sobrantes de cada tipología siguen la opción elegida, dentro de su propia tipología: con `Crear un equipo nuevo` forman un equipo más pequeño del mismo tipo (si sobra una sola persona, otro equipo de su tipo le cede un miembro); con `Agregar a otros equipos` se reparten entre los equipos de su tipo. Si sobran más personas que equipos hay de ese tipo, forman su propio equipo para no crear equipos demasiado grandes.
+  - Las personas incompatibles se colocan antes que el resto, cada una en un equipo de su tipología donde no haya nadie incompatible con ella.
+  - Las personas que no pueden quedarse en un equipo de su tipología (una tipología con una sola persona o incompatibles sin sitio) se colocan aparte: con `Crear un equipo nuevo` forman juntas un equipo si son al menos dos; en otro caso se unen al equipo compatible más adecuado, con estas preferencias: A → equipos con mayoría B, C → mayoría B, B → mayoría A o C, y a igual preferencia el más pequeño.
+  - Nunca se coloca a nadie en un equipo con una persona incompatible. Si al final queda un equipo de una persona, se une a otro equipo compatible y, si no hay ninguno, otro equipo le cede un miembro compatible.
 - **Cuándo se viola la descripción:**
   - Cuando no hay suficientes alumnos de un tipo para completar equipos, se pueden mezclar con otro tipo para evitar equipos de una persona. El algoritmo prioriza mantenerlos homogéneos, pero permite mezclar en los mínimos casos necesarios.
 
@@ -39,5 +40,4 @@
 - **Cuándo se viola la descripción:**
   - Solo cuando el número total no permite equipos exactos del tamaño solicitado; se aplican las mismas reglas de sobrantes que en heterogéneos.
 - **Sobrantes:**
-  - `Crear un equipo nuevo`: se agrupan entre sí; si no alcanza, se combinan para evitar equipos de una persona.
-  - `Agregar a otros equipos`: se suman a los grupos existentes, escogiendo el equipo con menos integrantes en cada paso.
+  - Las mismas que en heterogéneos: `Crear un equipo nuevo` forma un equipo más pequeño, que nunca es de una persona, y `Agregar a otros equipos` reparte los sobrantes de uno en uno entre los equipos existentes.

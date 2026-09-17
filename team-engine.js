@@ -20,19 +20,40 @@
     return lista.map(nombre => ({ nombre, tipo }));
   }
 
-  function calculateMaxGroups(totalStudents, membersPerGroup, leftoversOption) {
+  function calcularCapacidades(totalStudents, membersPerGroup, leftoversOption) {
     if (!membersPerGroup || membersPerGroup <= 0 || totalStudents <= 0) {
-      return 0;
+      return [];
     }
     const baseGroups = Math.floor(totalStudents / membersPerGroup);
     const remainder = totalStudents % membersPerGroup;
-    if (baseGroups === 0 && remainder > 0) {
-      return 1;
+    if (baseGroups === 0) {
+      return [totalStudents];
     }
-    if (remainder > 0 && leftoversOption === 'grupoNuevo') {
-      return baseGroups + 1;
+    const capacidades = Array.from({ length: baseGroups }, () => membersPerGroup);
+    if (remainder === 0) {
+      return capacidades;
     }
-    return baseGroups > 0 ? baseGroups : (remainder > 0 ? 1 : 0);
+    if (leftoversOption === 'grupoNuevo') {
+      if (remainder >= 2) {
+        capacidades.push(remainder);
+      } else if (membersPerGroup >= 3) {
+        // Un único sobrante no forma equipo: se completa con una persona de otro equipo.
+        capacidades[baseGroups - 1] = membersPerGroup - 1;
+        capacidades.push(2);
+      } else {
+        // Con equipos de 2 no se puede ceder a nadie sin dejar otro equipo unitario.
+        capacidades[baseGroups - 1] += 1;
+      }
+      return capacidades;
+    }
+    for (let i = 0; i < remainder; i++) {
+      capacidades[i % baseGroups] += 1;
+    }
+    return capacidades;
+  }
+
+  function calculateMaxGroups(totalStudents, membersPerGroup, leftoversOption) {
+    return calcularCapacidades(totalStudents, membersPerGroup, leftoversOption).length;
   }
 
   function countStudentsByType(grupo) {
@@ -42,20 +63,42 @@
     }, { A: 0, B: 0, C: 0 });
   }
 
-  function getAvailableGroups(grupos, numAlumnos) {
-    return grupos.filter(grupo => grupo.length < numAlumnos);
+  function construirMapaIncompatibles(incompatSets) {
+    const mapa = new Map();
+    incompatSets.forEach(set => {
+      set.forEach(alumno => {
+        if (!mapa.has(alumno.nombre)) {
+          mapa.set(alumno.nombre, new Set());
+        }
+        set.forEach(otro => {
+          if (otro.nombre !== alumno.nombre) {
+            mapa.get(alumno.nombre).add(otro.nombre);
+          }
+        });
+      });
+    });
+    return mapa;
   }
 
-  function getMinimumTypeCount(grupos, tipo, numAlumnos) {
-    const availableGroups = getAvailableGroups(grupos, numAlumnos);
+  function tieneConflicto(grupo, alumno, mapaIncompatibles) {
+    const incompatibles = mapaIncompatibles.get(alumno.nombre);
+    return Boolean(incompatibles) && grupo.some(miembro => incompatibles.has(miembro.nombre));
+  }
+
+  function getAvailableGroups(grupos, capacidades) {
+    return grupos.filter((grupo, indice) => grupo.length < capacidades[indice]);
+  }
+
+  function getMinimumTypeCount(grupos, capacidades, tipo) {
+    const availableGroups = getAvailableGroups(grupos, capacidades);
     if (availableGroups.length === 0) {
       return 0;
     }
     return Math.min(...availableGroups.map(grupo => countStudentsByType(grupo)[tipo]));
   }
 
-  function getMinimumSupportCount(grupos, numAlumnos) {
-    const availableGroups = getAvailableGroups(grupos, numAlumnos);
+  function getMinimumSupportCount(grupos, capacidades) {
+    const availableGroups = getAvailableGroups(grupos, capacidades);
     if (availableGroups.length === 0) {
       return 0;
     }
@@ -65,15 +108,16 @@
     }));
   }
 
-  function puntuarGrupoParaIncompatible(grupo, alumno, grupos, numAlumnos, mode) {
-    if (grupo.length >= numAlumnos) {
-      return Number.NEGATIVE_INFINITY;
+  function puntuarGrupoParaIncompatible(grupo, capacidad, alumno, grupos, capacidades, mode) {
+    if (grupo.length >= capacidad) {
+      // Solo se usa si no queda hueco en ningún equipo compatible.
+      return -1000000 - grupo.length;
     }
-    let score = (numAlumnos - grupo.length) * 25;
+    let score = (capacidad - grupo.length) * 25;
     if (mode === 'heterogeneos') {
       const counts = countStudentsByType(grupo);
-      const minTipo = getMinimumTypeCount(grupos, alumno.tipo, numAlumnos);
-      const minApoyo = getMinimumSupportCount(grupos, numAlumnos);
+      const minTipo = getMinimumTypeCount(grupos, capacidades, alumno.tipo);
+      const minApoyo = getMinimumSupportCount(grupos, capacidades);
       score -= counts[alumno.tipo] * 20;
       if (counts[alumno.tipo] === minTipo) {
         score += 80;
@@ -81,24 +125,11 @@
       if ((alumno.tipo === 'A' || alumno.tipo === 'C') && (counts.A + counts.C) === minApoyo) {
         score += 90;
       }
-    } else if (mode === 'homogeneos') {
-      const counts = countStudentsByType(grupo);
-      const mixedPenalty = Object.entries(counts).reduce((acc, [tipo, cantidad]) => {
-        if (tipo !== alumno.tipo && cantidad > 0) {
-          return acc + cantidad * 25;
-        }
-        return acc;
-      }, 0);
-      score -= mixedPenalty;
-      score += counts[alumno.tipo] * 15;
     }
     return score;
   }
 
-  function preAsignarIncompatibles(grupos, incompatSets, numAlumnos, mode) {
-    if (grupos.length === 0 && incompatSets.length > 0) {
-      grupos.push([]);
-    }
+  function preAsignarIncompatibles(grupos, capacidades, incompatSets, mapaIncompatibles, mode) {
     const orderedSets = [...incompatSets].sort((a, b) => {
       if (b.length !== a.length) {
         return b.length - a.length;
@@ -108,15 +139,12 @@
       return apoyoB - apoyoA;
     });
     orderedSets.forEach(set => {
-      const nombresSet = new Set(set.map(alumno => alumno.nombre));
       set.forEach(alumno => {
         let mejorIndice = -1;
         let mejorPuntuacion = Number.NEGATIVE_INFINITY;
         for (let i = 0; i < grupos.length; i++) {
-          const grupo = grupos[i];
-          const conflicto = grupo.some(miembro => nombresSet.has(miembro.nombre));
-          if (conflicto) continue;
-          const puntuacion = puntuarGrupoParaIncompatible(grupo, alumno, grupos, numAlumnos, mode);
+          if (tieneConflicto(grupos[i], alumno, mapaIncompatibles)) continue;
+          const puntuacion = puntuarGrupoParaIncompatible(grupos[i], capacidades[i], alumno, grupos, capacidades, mode);
           if (puntuacion > mejorPuntuacion) {
             mejorPuntuacion = puntuacion;
             mejorIndice = i;
@@ -124,6 +152,7 @@
         }
         if (mejorIndice === -1) {
           grupos.push([alumno]);
+          capacidades.push(1);
         } else {
           grupos[mejorIndice].push(alumno);
         }
@@ -131,17 +160,13 @@
     });
   }
 
-  function distribuirAlumnosPorGrupo(alumnos, grupos, numAlumnos, sobrantes) {
-    if (grupos.length === 0) {
-      sobrantes.push(...alumnos);
-      return;
-    }
+  function distribuirAlumnosPorGrupo(alumnos, grupos, capacidades, sobrantes) {
     let indicePreferente = 0;
     alumnos.forEach(alumno => {
       let colocado = false;
       for (let i = 0; i < grupos.length; i++) {
         const indice = (indicePreferente + i) % grupos.length;
-        if (grupos[indice].length < numAlumnos) {
+        if (grupos[indice].length < capacidades[indice]) {
           grupos[indice].push(alumno);
           indicePreferente = indice + 1;
           colocado = true;
@@ -154,14 +179,14 @@
     });
   }
 
-  function puntuarGrupoHeterogeneoParaAlumno(grupo, alumno, grupos, numAlumnos) {
-    if (grupo.length >= numAlumnos) {
+  function puntuarGrupoHeterogeneoParaAlumno(grupo, capacidad, alumno, grupos, capacidades) {
+    if (grupo.length >= capacidad) {
       return Number.NEGATIVE_INFINITY;
     }
     const counts = countStudentsByType(grupo);
-    const minTipo = getMinimumTypeCount(grupos, alumno.tipo, numAlumnos);
-    const minApoyo = getMinimumSupportCount(grupos, numAlumnos);
-    let score = (numAlumnos - grupo.length) * 30;
+    const minTipo = getMinimumTypeCount(grupos, capacidades, alumno.tipo);
+    const minApoyo = getMinimumSupportCount(grupos, capacidades);
+    let score = (capacidad - grupo.length) * 30;
     score -= counts[alumno.tipo] * 20;
     if (counts[alumno.tipo] === minTipo) {
       score += 110;
@@ -206,12 +231,12 @@
     return score;
   }
 
-  function asignarAlumnosHeterogeneos(alumnos, grupos, numAlumnos, sobrantes) {
+  function asignarAlumnosHeterogeneos(alumnos, grupos, capacidades, sobrantes) {
     alumnos.forEach(alumno => {
       let mejorIndice = -1;
       let mejorPuntuacion = Number.NEGATIVE_INFINITY;
       for (let i = 0; i < grupos.length; i++) {
-        const puntuacion = puntuarGrupoHeterogeneoParaAlumno(grupos[i], alumno, grupos, numAlumnos);
+        const puntuacion = puntuarGrupoHeterogeneoParaAlumno(grupos[i], capacidades[i], alumno, grupos, capacidades);
         if (puntuacion > mejorPuntuacion) {
           mejorPuntuacion = puntuacion;
           mejorIndice = i;
@@ -225,15 +250,12 @@
     });
   }
 
-  function evaluarGrupoHeterogeneo(grupo, numAlumnos) {
+  function evaluarGrupoHeterogeneo(grupo) {
     const counts = countStudentsByType(grupo);
     let penalty = 0;
 
     if (grupo.length === 0) {
       return 100;
-    }
-    if (grupo.length < numAlumnos) {
-      penalty += (numAlumnos - grupo.length) * 4;
     }
     if (counts.A === 0) {
       penalty += 12;
@@ -257,26 +279,28 @@
     return penalty;
   }
 
-  function optimizarGruposHeterogeneos(grupos, numAlumnos, incompatiblesSet) {
-    for (let pass = 0; pass < 4; pass++) {
+  function optimizarGruposHeterogeneos(grupos, incompatiblesSet) {
+    // Intercambios de dos en dos mientras mejoren el conjunto; los tamaños no cambian.
+    for (let pass = 0; pass < 200; pass++) {
       let improved = false;
-      for (let i = 0; i < grupos.length; i++) {
-        for (let j = i + 1; j < grupos.length; j++) {
+      for (let i = 0; i < grupos.length && !improved; i++) {
+        for (let j = i + 1; j < grupos.length && !improved; j++) {
           const grupoA = grupos[i];
           const grupoB = grupos[j];
-          const basePenalty = evaluarGrupoHeterogeneo(grupoA, numAlumnos) + evaluarGrupoHeterogeneo(grupoB, numAlumnos);
+          const basePenalty = evaluarGrupoHeterogeneo(grupoA) + evaluarGrupoHeterogeneo(grupoB);
 
-          for (let a = 0; a < grupoA.length; a++) {
+          for (let a = 0; a < grupoA.length && !improved; a++) {
             if (incompatiblesSet.has(grupoA[a].nombre)) continue;
             for (let b = 0; b < grupoB.length; b++) {
               if (incompatiblesSet.has(grupoB[b].nombre)) continue;
               const alumnoA = grupoA[a];
               const alumnoB = grupoB[b];
+              if (alumnoA.tipo === alumnoB.tipo) continue;
 
               grupoA[a] = alumnoB;
               grupoB[b] = alumnoA;
 
-              const newPenalty = evaluarGrupoHeterogeneo(grupoA, numAlumnos) + evaluarGrupoHeterogeneo(grupoB, numAlumnos);
+              const newPenalty = evaluarGrupoHeterogeneo(grupoA) + evaluarGrupoHeterogeneo(grupoB);
               if (newPenalty < basePenalty) {
                 improved = true;
                 break;
@@ -285,16 +309,7 @@
               grupoA[a] = alumnoA;
               grupoB[b] = alumnoB;
             }
-            if (improved) {
-              break;
-            }
           }
-          if (improved) {
-            break;
-          }
-        }
-        if (improved) {
-          break;
         }
       }
       if (!improved) {
@@ -313,17 +328,13 @@
       for (let j = 0; j < grupos.length; j++) {
         if (j === indiceGrupo) continue;
         const grupoDonante = grupos[j];
-        const indiceA = grupoDonante.findIndex(alumno => alumno.tipo === 'A' && !incompatiblesSet.has(alumno.nombre));
-        if (indiceA !== -1) {
-          const intercambio = grupoDonante[indiceA];
-          grupoDonante[indiceA] = grupo[indiceBDisponible];
-          grupo[indiceBDisponible] = intercambio;
-          return;
-        }
-        const indiceC = grupoDonante.findIndex(alumno => alumno.tipo === 'C' && !incompatiblesSet.has(alumno.nombre));
-        if (indiceC !== -1) {
-          const intercambio = grupoDonante[indiceC];
-          grupoDonante[indiceC] = grupo[indiceBDisponible];
+        const counts = countStudentsByType(grupoDonante);
+        // El equipo donante no puede quedarse sin A ni C.
+        if (counts.A + counts.C < 2) continue;
+        const indiceApoyo = grupoDonante.findIndex(alumno => (alumno.tipo === 'A' || alumno.tipo === 'C') && !incompatiblesSet.has(alumno.nombre));
+        if (indiceApoyo !== -1) {
+          const intercambio = grupoDonante[indiceApoyo];
+          grupoDonante[indiceApoyo] = grupo[indiceBDisponible];
           grupo[indiceBDisponible] = intercambio;
           return;
         }
@@ -331,89 +342,15 @@
     });
   }
 
-  function manejarSobrantes(grupos, opcion, numAlumnos, sobrantes) {
-    if (!sobrantes || sobrantes.length === 0) {
-      return grupos;
-    }
-    if (opcion === 'grupoNuevo') {
-      grupos.push([...sobrantes]);
-      return grupos;
-    }
-    if (grupos.length === 0) {
-      grupos.push([]);
-    }
-    let indicePreferente = 0;
+  function colocarSobrantes(grupos, sobrantes, mapaIncompatibles) {
     sobrantes.forEach(alumno => {
-      let colocado = false;
-      for (let i = 0; i < grupos.length; i++) {
-        const indice = (indicePreferente + i) % grupos.length;
-        if (grupos[indice].length < numAlumnos) {
-          grupos[indice].push(alumno);
-          indicePreferente = indice + 1;
-          colocado = true;
-          break;
-        }
-      }
-      if (!colocado) {
-        let indiceMin = 0;
-        let longitudMin = grupos[0].length;
-        for (let i = 1; i < grupos.length; i++) {
-          if (grupos[i].length < longitudMin) {
-            longitudMin = grupos[i].length;
-            indiceMin = i;
-          }
-        }
-        grupos[indiceMin].push(alumno);
-        indicePreferente = indiceMin + 1;
-      }
-    });
-    return grupos;
-  }
-
-  function distribuirHomogeneosPorTipo(alumnos, grupos, numAlumnos, sobrantes, tipo) {
-    alumnos.forEach(alumno => {
-      let colocado = false;
-      for (let i = 0; i < grupos.length; i++) {
-        const grupo = grupos[i];
-        if (grupo.length >= numAlumnos) continue;
-        const mezcla = grupo.some(miembro => miembro.tipo !== tipo);
-        if (!mezcla) {
-          grupo.push(alumno);
-          colocado = true;
-          break;
-        }
-      }
-      if (!colocado) {
+      const candidatos = grupos.filter(grupo => !tieneConflicto(grupo, alumno, mapaIncompatibles));
+      if (candidatos.length === 0) {
         grupos.push([alumno]);
+        return;
       }
+      candidatos.sort((x, y) => x.length - y.length)[0].push(alumno);
     });
-    grupos.forEach(grupo => {
-      while (grupo.length > numAlumnos) {
-        sobrantes.push(grupo.pop());
-      }
-    });
-  }
-
-  function agruparSobrantesHomogeneos(sobrantes, numAlumnos) {
-    if (sobrantes.length === 0) return [];
-    const copia = [...sobrantes];
-    const grupos = [];
-    while (copia.length > 0) {
-      const size = Math.min(numAlumnos, copia.length);
-      grupos.push(copia.splice(0, size));
-    }
-    for (let i = grupos.length - 1; i >= 0; i--) {
-      if (grupos[i].length === 1 && grupos.length > 1) {
-        const donante = grupos.find(grupo => grupo.length > 2);
-        if (donante) {
-          grupos[i].push(donante.pop());
-        } else if (i > 0) {
-          grupos[i - 1].push(grupos[i][0]);
-          grupos.splice(i, 1);
-        }
-      }
-    }
-    return grupos;
   }
 
   function tipoPredominante(grupo) {
@@ -432,97 +369,148 @@
     return mejorTipo;
   }
 
-  function agregarSobrantesHomogeneos(grupos, alumnos) {
-    alumnos.forEach(alumno => {
-      const preferencias = alumno.tipo === 'A'
-        ? ['B', 'A', 'C']
-        : alumno.tipo === 'C'
-          ? ['B', 'C', 'A']
-          : ['A', 'C', 'B'];
-      let destino = null;
-      for (const pref of preferencias) {
-        destino = grupos.find(grupo => tipoPredominante(grupo) === pref);
-        if (destino) break;
-      }
-      if (!destino) {
-        destino = grupos[0];
-      }
-      if (destino) {
-        destino.push(alumno);
-      } else {
-        grupos.push([alumno]);
-      }
-    });
+  const PREFERENCIAS_SUELTOS = {
+    A: ['B', 'A', 'C'],
+    B: ['A', 'C', 'B'],
+    C: ['B', 'C', 'A']
+  };
+
+  function colocarSueltoHomogeneo(grupos, alumno, mapaIncompatibles) {
+    const candidatos = grupos.filter(grupo => grupo.length > 0 && !tieneConflicto(grupo, alumno, mapaIncompatibles));
+    if (candidatos.length === 0) {
+      return false;
+    }
+    const preferencias = PREFERENCIAS_SUELTOS[alumno.tipo];
+    const rango = grupo => {
+      const indice = preferencias.indexOf(tipoPredominante(grupo));
+      return indice === -1 ? preferencias.length : indice;
+    };
+    candidatos.sort((x, y) => rango(x) - rango(y) || x.length - y.length)[0].push(alumno);
+    return true;
   }
 
-  function fusionarGruposUnitarios(grupos) {
+  function cederCompanero(grupos, grupoUnitario, mapaIncompatibles) {
+    // Si nadie puede acoger a la persona sola, otro equipo le cede a alguien compatible.
+    const [alumno] = grupoUnitario;
+    const donantes = grupos
+      .filter(grupo => grupo !== grupoUnitario && grupo.length >= 3)
+      .sort((x, y) => y.length - x.length);
+    for (const donante of donantes) {
+      const opciones = donante
+        .map((miembro, indice) => ({ miembro, indice }))
+        .filter(({ miembro }) => !mapaIncompatibles.has(miembro.nombre) || !tieneConflicto([alumno], miembro, mapaIncompatibles))
+        .sort((x, y) => (y.miembro.tipo === alumno.tipo) - (x.miembro.tipo === alumno.tipo));
+      if (opciones.length > 0) {
+        grupoUnitario.push(donante.splice(opciones[0].indice, 1)[0]);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function fusionarGruposUnitarios(grupos, mapaIncompatibles) {
     for (let i = grupos.length - 1; i >= 0; i--) {
-      if (grupos[i].length === 1) {
-        const alumno = grupos[i][0];
-        grupos.splice(i, 1);
-        agregarSobrantesHomogeneos(grupos, [alumno]);
+      if (grupos[i].length !== 1 || grupos.length === 1) continue;
+      const [grupo] = grupos.splice(i, 1);
+      if (!colocarSueltoHomogeneo(grupos, grupo[0], mapaIncompatibles)) {
+        cederCompanero(grupos, grupo, mapaIncompatibles);
+        grupos.splice(i, 0, grupo);
       }
     }
   }
 
-  function generarGruposHeterogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, totalAlumnosOriginal) {
-    let numGrupos = Math.floor(totalAlumnosOriginal / numAlumnos);
-    if (numGrupos === 0 && totalAlumnosOriginal > 0) {
-      numGrupos = 1;
-    }
-    const grupos = Array.from({ length: numGrupos }, () => []);
+  function generarGruposHeterogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, mapaIncompatibles, opcionSobrantes, totalAlumnosOriginal) {
+    const capacidades = calcularCapacidades(totalAlumnosOriginal, numAlumnos, opcionSobrantes);
+    const grupos = capacidades.map(() => []);
     const sobrantes = [];
-    preAsignarIncompatibles(grupos, incompatSets, numAlumnos, 'heterogeneos');
-    asignarAlumnosHeterogeneos(listaA, grupos, numAlumnos, sobrantes);
-    asignarAlumnosHeterogeneos(listaC, grupos, numAlumnos, sobrantes);
-    asignarAlumnosHeterogeneos(listaB, grupos, numAlumnos, sobrantes);
-    const incompatiblesSet = new Set(incompatSets.flat().map(alumno => alumno.nombre));
+    preAsignarIncompatibles(grupos, capacidades, incompatSets, mapaIncompatibles, 'heterogeneos');
+    asignarAlumnosHeterogeneos(listaA, grupos, capacidades, sobrantes);
+    asignarAlumnosHeterogeneos(listaC, grupos, capacidades, sobrantes);
+    asignarAlumnosHeterogeneos(listaB, grupos, capacidades, sobrantes);
+    const incompatiblesSet = new Set(mapaIncompatibles.keys());
     balancearGruposHeterogeneos(grupos, incompatiblesSet);
-    optimizarGruposHeterogeneos(grupos, numAlumnos, incompatiblesSet);
-    if (grupos.length > numGrupos) {
-      const extras = grupos.splice(numGrupos);
-      extras.flat().forEach(alumno => sobrantes.push(alumno));
-    }
-    return { grupos, sobrantes };
+    optimizarGruposHeterogeneos(grupos, incompatiblesSet);
+    colocarSobrantes(grupos, sobrantes, mapaIncompatibles);
+    return grupos.filter(grupo => grupo.length > 0);
   }
 
-  function generarGruposHomogeneos(listaA, listaB, listaC, numAlumnos, incompatSets, opcionSobrantes, totalAlumnosOriginal) {
-    let numGrupos = Math.floor(totalAlumnosOriginal / numAlumnos);
-    if (numGrupos === 0 && totalAlumnosOriginal > 0) {
-      numGrupos = 1;
-    }
-    const grupos = Array.from({ length: numGrupos }, () => []);
-    const sobrantes = [];
-    preAsignarIncompatibles(grupos, incompatSets, numAlumnos, 'homogeneos');
-    distribuirHomogeneosPorTipo(listaA, grupos, numAlumnos, sobrantes, 'A');
-    distribuirHomogeneosPorTipo(listaB, grupos, numAlumnos, sobrantes, 'B');
-    distribuirHomogeneosPorTipo(listaC, grupos, numAlumnos, sobrantes, 'C');
-    const gruposSobrantes = agruparSobrantesHomogeneos(sobrantes, numAlumnos);
-    if (opcionSobrantes === 'agregar') {
-      agregarSobrantesHomogeneos(grupos, gruposSobrantes.flat());
-      fusionarGruposUnitarios(grupos);
-      return { grupos, sobrantes: [] };
-    }
-    if (gruposSobrantes.length === 1 && gruposSobrantes[0].length === 1 && grupos.length > 0) {
-      agregarSobrantesHomogeneos(grupos, gruposSobrantes[0]);
+  function generarGruposHomogeneos(listas, numAlumnos, incompatSets, mapaIncompatibles, opcionSobrantes) {
+    const grupos = [];
+    const sueltos = [];
+    const incompatibles = [...incompatSets].sort((a, b) => b.length - a.length).flat();
+
+    ['A', 'B', 'C'].forEach(tipo => {
+      const incompatiblesDelTipo = incompatibles.filter(alumno => alumno.tipo === tipo);
+      const resto = listas[tipo];
+      const total = incompatiblesDelTipo.length + resto.length;
+      if (total === 0) return;
+      if (total === 1) {
+        sueltos.push(...incompatiblesDelTipo, ...resto);
+        return;
+      }
+      // Si sobran más personas que equipos hay de la tipología, forman su propio equipo.
+      const demasiadosSobrantes = total % numAlumnos > Math.floor(total / numAlumnos);
+      const opcionTipo = opcionSobrantes === 'agregar' && demasiadosSobrantes ? 'grupoNuevo' : opcionSobrantes;
+      const capacidades = calcularCapacidades(total, numAlumnos, opcionTipo);
+      const equipos = capacidades.map(() => []);
+      incompatiblesDelTipo.forEach(alumno => {
+        let mejorIndice = -1;
+        equipos.forEach((equipo, i) => {
+          if (equipo.length >= capacidades[i] || tieneConflicto(equipo, alumno, mapaIncompatibles)) return;
+          if (mejorIndice === -1 || capacidades[i] - equipo.length > capacidades[mejorIndice] - equipos[mejorIndice].length) {
+            mejorIndice = i;
+          }
+        });
+        if (mejorIndice === -1) {
+          // No cabe en ningún equipo de su tipología sin coincidir con alguien incompatible.
+          sueltos.push(alumno);
+        } else {
+          equipos[mejorIndice].push(alumno);
+        }
+      });
+      resto.forEach(alumno => {
+        const indice = equipos.findIndex((equipo, i) => equipo.length < capacidades[i]);
+        if (indice === -1) {
+          sueltos.push(alumno);
+        } else {
+          equipos[indice].push(alumno);
+        }
+      });
+      grupos.push(...equipos.filter(equipo => equipo.length > 0));
+    });
+
+    if (opcionSobrantes === 'grupoNuevo' && sueltos.length >= 2) {
+      const nuevos = [];
+      sueltos.forEach(alumno => {
+        const destino = nuevos.find(grupo => grupo.length < numAlumnos && !tieneConflicto(grupo, alumno, mapaIncompatibles));
+        if (destino) {
+          destino.push(alumno);
+        } else {
+          nuevos.push([alumno]);
+        }
+      });
+      grupos.push(...nuevos);
     } else {
-      gruposSobrantes.forEach(grupo => grupos.push(grupo));
+      sueltos.forEach(alumno => {
+        if (!colocarSueltoHomogeneo(grupos, alumno, mapaIncompatibles)) {
+          grupos.push([alumno]);
+        }
+      });
     }
-    fusionarGruposUnitarios(grupos);
-    return { grupos, sobrantes: [] };
+
+    fusionarGruposUnitarios(grupos, mapaIncompatibles);
+    return grupos;
   }
 
-  function generarGruposEsporadicos(listaRestante, numAlumnos, incompatSets, totalAlumnosOriginal, randomFn) {
-    let numGrupos = Math.floor(totalAlumnosOriginal / numAlumnos);
-    if (numGrupos === 0 && totalAlumnosOriginal > 0) {
-      numGrupos = 1;
-    }
-    const grupos = Array.from({ length: numGrupos }, () => []);
+  function generarGruposEsporadicos(listaRestante, numAlumnos, incompatSets, mapaIncompatibles, opcionSobrantes, totalAlumnosOriginal, randomFn) {
+    const capacidades = calcularCapacidades(totalAlumnosOriginal, numAlumnos, opcionSobrantes);
+    const grupos = capacidades.map(() => []);
     const sobrantes = [];
-    preAsignarIncompatibles(grupos, incompatSets, numAlumnos, 'default');
+    preAsignarIncompatibles(grupos, capacidades, incompatSets, mapaIncompatibles, 'default');
     const mezcla = shuffleArray([...listaRestante], randomFn);
-    distribuirAlumnosPorGrupo(mezcla, grupos, numAlumnos, sobrantes);
-    return { grupos, sobrantes };
+    distribuirAlumnosPorGrupo(mezcla, grupos, capacidades, sobrantes);
+    colocarSobrantes(grupos, sobrantes, mapaIncompatibles);
+    return grupos.filter(grupo => grupo.length > 0);
   }
 
   function buildInputMap(listaAlumnosA, listaAlumnosB, listaAlumnosC) {
@@ -564,30 +552,20 @@
     listaAlumnosC = listaAlumnosC.filter(alumno => !nombresIncompatibles.has(alumno.nombre));
 
     const totalOriginal = grupoA.length + grupoB.length + grupoC.length;
-    let resultado;
+    const mapaIncompatibles = construirMapaIncompatibles(incompatSets);
+    let teams;
 
     if (tipoGrupo === 'heterogeneos') {
-      resultado = generarGruposHeterogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, totalOriginal);
-      return {
-        teams: manejarSobrantes(resultado.grupos, opcionSobrantes, numAlumnos, resultado.sobrantes),
-        incompatSets
-      };
+      teams = generarGruposHeterogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, mapaIncompatibles, opcionSobrantes, totalOriginal);
+    } else if (tipoGrupo === 'homogeneos') {
+      const listas = { A: listaAlumnosA, B: listaAlumnosB, C: listaAlumnosC };
+      teams = generarGruposHomogeneos(listas, numAlumnos, incompatSets, mapaIncompatibles, opcionSobrantes);
+    } else {
+      const combinados = [...listaAlumnosA, ...listaAlumnosB, ...listaAlumnosC];
+      teams = generarGruposEsporadicos(combinados, numAlumnos, incompatSets, mapaIncompatibles, opcionSobrantes, totalOriginal, random);
     }
 
-    if (tipoGrupo === 'homogeneos') {
-      resultado = generarGruposHomogeneos(listaAlumnosA, listaAlumnosB, listaAlumnosC, numAlumnos, incompatSets, opcionSobrantes, totalOriginal);
-      return {
-        teams: resultado.grupos,
-        incompatSets
-      };
-    }
-
-    const combinados = [...listaAlumnosA, ...listaAlumnosB, ...listaAlumnosC];
-    resultado = generarGruposEsporadicos(combinados, numAlumnos, incompatSets, totalOriginal, random);
-    return {
-      teams: manejarSobrantes(resultado.grupos, opcionSobrantes, numAlumnos, resultado.sobrantes),
-      incompatSets
-    };
+    return { teams, incompatSets };
   }
 
   return {

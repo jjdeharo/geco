@@ -7,6 +7,10 @@ function namesOf(teams) {
   return teams.flat().map(student => student.nombre).sort();
 }
 
+function mk(prefix, count) {
+  return Array.from({ length: count }, (_, i) => `${prefix}${i}`);
+}
+
 function teamContaining(teams, name) {
   return teams.find(team => team.some(student => student.nombre === name));
 }
@@ -69,8 +73,8 @@ test('sporadic generation preserves all students and keeps incompatible groups a
   assert.equal(teamB1.some(student => student.nombre === 'C1'), false);
 });
 
-test('grupoNuevo keeps leftovers in a separate team when division is not exact', () => {
-  const teams = engine.generateTeams({
+test('grupoNuevo never leaves a single leftover alone', () => {
+  const pairs = engine.generateTeams({
     grupoA: ['A1'],
     grupoB: ['B1', 'B2', 'B3'],
     grupoC: ['C1'],
@@ -80,8 +84,57 @@ test('grupoNuevo keeps leftovers in a separate team when division is not exact',
     incompatibleGroups: [],
     random: () => 0
   }).teams;
+  assert.deepEqual(pairs.map(team => team.length).sort(), [2, 3]);
 
-  assert.deepEqual(teams.map(team => team.length), [2, 2, 1]);
+  const teams = engine.generateTeams({
+    grupoA: mk('A', 6),
+    grupoB: mk('B', 15),
+    grupoC: mk('C', 4),
+    numAlumnos: 4,
+    tipoGrupo: 'esporadicos',
+    opcionSobrantes: 'grupoNuevo',
+    incompatibleGroups: []
+  }).teams;
+  assert.equal(teams.length, 7);
+  assert.deepEqual(teams.map(team => team.length).sort(), [2, 3, 4, 4, 4, 4, 4]);
+});
+
+test('heterogeneous leftover team also receives A or C students', () => {
+  for (let i = 0; i < 200; i++) {
+    const teams = engine.generateTeams({
+      grupoA: mk('A', 7),
+      grupoB: mk('B', 12),
+      grupoC: mk('C', 3),
+      numAlumnos: 6,
+      tipoGrupo: 'heterogeneos',
+      opcionSobrantes: 'grupoNuevo',
+      incompatibleGroups: [['A1', 'B1', 'B2']]
+    }).teams;
+    assert.equal(teams.length, 4);
+    assert.equal(teams.some(team => team.every(student => student.tipo === 'B')), false);
+  }
+});
+
+test('homogeneous generation keeps incompatible students apart', () => {
+  for (let i = 0; i < 200; i++) {
+    const incompatibleGroups = [['A1', 'A4', 'B0', 'A0'], ['B2', 'A2']];
+    const teams = engine.generateTeams({
+      grupoA: mk('A', 5),
+      grupoB: mk('B', 8),
+      grupoC: mk('C', 2),
+      numAlumnos: 3,
+      tipoGrupo: 'homogeneos',
+      opcionSobrantes: i % 2 ? 'agregar' : 'grupoNuevo',
+      incompatibleGroups
+    }).teams;
+    assert.equal(teams.flat().length, 15);
+    incompatibleGroups.forEach(group => {
+      teams.forEach(team => {
+        assert.ok(team.filter(student => group.includes(student.nombre)).length <= 1);
+      });
+    });
+    assert.equal(teams.some(team => team.length === 1), false);
+  }
 });
 
 test('heterogeneous generation still preserves all students when A or C are scarce', () => {
