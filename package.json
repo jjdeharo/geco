@@ -28,6 +28,7 @@
     "asar": true,
     "files": [
       "analytics.js",
+      "theme.js",
       "index.html",
       "instr.html",
       "main.js",

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guía de GeCo</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script src="theme.js"></script>
   <style>
     :root {
       --primary-color: #4a6fa5;
@@ -17,6 +18,57 @@
       --accent-color: #e67e22;
       --highlight-bg: #e8f0ff;
       --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --card-bg: white;
+      --primary-hover: #3d5f8a;
+      --image-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      color-scheme: light;
+    }
+
+    :root[data-theme="dark"] {
+      --primary-color: #9dbbe3;
+      --secondary-color: #e6ebf0;
+      --background-color: #15191e;
+      --text-color: #d9dee4;
+      --border-color: #333b44;
+      --success-color: #6fd49a;
+      --light-color: #262d35;
+      --accent-color: #f0a868;
+      --highlight-bg: #1f2a38;
+      --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      --card-bg: #1f252c;
+      --primary-hover: #b6cdec;
+      --image-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+
+    :root[data-theme="dark"] {
+      scrollbar-color: #48535e transparent;
+    }
+
+    .header-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      background-color: var(--light-color);
+      color: var(--primary-color);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .theme-toggle:focus-visible {
+      outline: 3px solid var(--primary-color);
+      outline-offset: 2px;
     }
 
     * {
@@ -86,16 +138,17 @@
       border-radius: 4px;
       cursor: pointer;
       font-weight: 500;
+      color: var(--text-color);
       transition: all 0.3s;
     }
 
     .lang-btn.active {
       background-color: var(--primary-color);
-      color: white;
+      color: var(--card-bg);
     }
 
     .card {
-      background-color: white;
+      background-color: var(--card-bg);
       border-radius: 10px;
       padding: 30px;
       box-shadow: var(--card-shadow);
@@ -133,7 +186,7 @@
       display: block;
       margin: 25px auto;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: var(--image-shadow);
     }
 
     .highlight {
@@ -148,7 +201,7 @@
       display: inline-block;
       padding: 12px 24px;
       background-color: var(--primary-color);
-      color: white;
+      color: var(--card-bg);
       border: none;
       border-radius: 6px;
       cursor: pointer;
@@ -160,7 +213,7 @@
     }
 
     .btn:hover {
-      background-color: #3d5f8a;
+      background-color: var(--primary-hover);
       transform: translateY(-2px);
     }
 
@@ -198,7 +251,10 @@
     
     <div class="header-container">
       <a href="index.html" class="nav-link" id="back-link">Volver a GeCo</a>
-      <div class="language-switcher" id="languageSwitcher"></div>
+      <div class="header-tools">
+        <button type="button" class="theme-toggle" id="themeToggle"></button>
+        <div class="language-switcher" id="languageSwitcher"></div>
+      </div>
     </div>
 
     <div class="card">
@@ -361,6 +417,14 @@
       localStorage.setItem('preferredLanguage', lang);
       applyTranslations();
       buildLanguageSwitcher();
+      updateThemeLabels();
+    }
+
+    function updateThemeLabels() {
+      const selected = TRANSLATIONS[currentLanguage] || TRANSLATIONS[DEFAULT_LANGUAGE];
+      if (window.GecoTheme) {
+        window.GecoTheme.setLabels(selected.themeToggle || TRANSLATIONS[DEFAULT_LANGUAGE].themeToggle);
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -369,6 +433,10 @@
       currentLanguage = initialLang;
       buildLanguageSwitcher();
       applyTranslations();
+      if (window.GecoTheme) {
+        window.GecoTheme.mountToggle(document.getElementById('themeToggle'));
+      }
+      updateThemeLabels();
     });
   </script>
 </body>

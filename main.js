@@ -1224,6 +1224,9 @@ function setLanguage(lang) {
   }
   applyTranslations();
   buildLanguageSwitcher();
+  if (window.GecoTheme) {
+    window.GecoTheme.setLabels({ toDark: t('themeToggle.toDark'), toLight: t('themeToggle.toLight') });
+  }
   applySampleNamesForLanguage(currentLanguage, previousLanguage);
   updateAssignmentsFromTextareas({ renderTable: false });
   updateInfoGrupos();
@@ -1395,11 +1398,11 @@ function mostrarEquipos(equipos) {
     const row = table.insertRow();
     const cellNum = row.insertCell();
     cellNum.style.padding = '10px';
-    cellNum.style.borderBottom = '1px solid #ddd';
+    cellNum.style.borderBottom = '1px solid var(--border-color)';
     cellNum.style.fontWeight = 'bold';
     const cellMiembros = row.insertCell();
     cellMiembros.style.padding = '10px';
-    cellMiembros.style.borderBottom = '1px solid #ddd';
+    cellMiembros.style.borderBottom = '1px solid var(--border-color)';
     cellNum.textContent = `${t('teamLabel', { index: index + 1 })} (${equipo.length}):`;
     const miembrosTexto = equipo
       .map(alumno => `(${alumno.tipo}) ${alumno.nombre}`)
@@ -1592,6 +1595,9 @@ function initialise() {
     throw new Error('GeCo runtime modules failed to load');
   }
   setupSampleNamesMetadata();
+  if (window.GecoTheme) {
+    window.GecoTheme.mountToggle(document.getElementById('themeToggle'));
+  }
   const savedLang = localStorage.getItem('preferredLanguage');
   const initialLang = savedLang || detectBrowserLanguage();
   setLanguage(initialLang);

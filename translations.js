@@ -1,6 +1,7 @@
 const TRANSLATIONS = {
   es: {
     languageName: 'ES',
+    themeToggle: { toDark: 'Activar tema oscuro', toLight: 'Activar tema claro' },
     locale: 'es-ES',
     title: 'Generador de equipos cooperativos',
     groupsTitle: 'Grupos de estudiantes',
@@ -205,6 +206,7 @@ const TRANSLATIONS = {
   },
   ca: {
     languageName: 'CA',
+    themeToggle: { toDark: 'Activa el tema fosc', toLight: 'Activa el tema clar' },
     locale: 'ca-ES',
     title: "Generador d'equips cooperatius",
     groupsTitle: "Grups d'estudiants",
@@ -398,6 +400,7 @@ const TRANSLATIONS = {
   },
   en: {
     languageName: 'EN',
+    themeToggle: { toDark: 'Switch to dark theme', toLight: 'Switch to light theme' },
     locale: 'en-US',
     title: 'Cooperative Team Generator',
     groupsTitle: 'Student groups',
@@ -588,6 +591,7 @@ const TRANSLATIONS = {
   },
   gl: {
     languageName: 'GL',
+    themeToggle: { toDark: 'Activar o tema escuro', toLight: 'Activar o tema claro' },
     locale: 'gl-ES',
     title: 'Xerador de equipos cooperativos',
     groupsTitle: 'Grupos de estudantes',
@@ -778,6 +782,7 @@ const TRANSLATIONS = {
   },
   eu: {
     languageName: 'EU',
+    themeToggle: { toDark: 'Aktibatu gai iluna', toLight: 'Aktibatu gai argia' },
     locale: 'eu-ES',
     title: 'Talde kooperatiboen sortzailea',
     groupsTitle: 'Ikasleen taldeak',
