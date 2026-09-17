@@ -279,7 +279,16 @@
     return penalty;
   }
 
-  function optimizarGruposHeterogeneos(grupos, incompatiblesSet) {
+  function intercambioSeguro(grupoX, indiceX, grupoY, indiceY, mapaIncompatibles) {
+    // El intercambio es válido si ninguno de los dos acaba con una persona incompatible.
+    const alumnoX = grupoX[indiceX];
+    const alumnoY = grupoY[indiceY];
+    const restoX = grupoX.filter((_, i) => i !== indiceX);
+    const restoY = grupoY.filter((_, i) => i !== indiceY);
+    return !tieneConflicto(restoX, alumnoY, mapaIncompatibles) && !tieneConflicto(restoY, alumnoX, mapaIncompatibles);
+  }
+
+  function optimizarGruposHeterogeneos(grupos, mapaIncompatibles) {
     // Intercambios de dos en dos mientras mejoren el conjunto; los tamaños no cambian.
     for (let pass = 0; pass < 200; pass++) {
       let improved = false;
@@ -290,12 +299,11 @@
           const basePenalty = evaluarGrupoHeterogeneo(grupoA) + evaluarGrupoHeterogeneo(grupoB);
 
           for (let a = 0; a < grupoA.length && !improved; a++) {
-            if (incompatiblesSet.has(grupoA[a].nombre)) continue;
             for (let b = 0; b < grupoB.length; b++) {
-              if (incompatiblesSet.has(grupoB[b].nombre)) continue;
               const alumnoA = grupoA[a];
               const alumnoB = grupoB[b];
               if (alumnoA.tipo === alumnoB.tipo) continue;
+              if (!intercambioSeguro(grupoA, a, grupoB, b, mapaIncompatibles)) continue;
 
               grupoA[a] = alumnoB;
               grupoB[b] = alumnoA;
@@ -318,25 +326,27 @@
     }
   }
 
-  function balancearGruposHeterogeneos(grupos, incompatiblesSet) {
+  function balancearGruposHeterogeneos(grupos, mapaIncompatibles) {
     grupos.forEach((grupo, indiceGrupo) => {
       const tieneA = grupo.some(alumno => alumno.tipo === 'A');
       const tieneC = grupo.some(alumno => alumno.tipo === 'C');
       if (tieneA || tieneC) return;
-      const indiceBDisponible = grupo.findIndex(alumno => alumno.tipo === 'B' && !incompatiblesSet.has(alumno.nombre));
-      if (indiceBDisponible === -1) return;
       for (let j = 0; j < grupos.length; j++) {
         if (j === indiceGrupo) continue;
         const grupoDonante = grupos[j];
         const counts = countStudentsByType(grupoDonante);
         // El equipo donante no puede quedarse sin A ni C.
         if (counts.A + counts.C < 2) continue;
-        const indiceApoyo = grupoDonante.findIndex(alumno => (alumno.tipo === 'A' || alumno.tipo === 'C') && !incompatiblesSet.has(alumno.nombre));
-        if (indiceApoyo !== -1) {
-          const intercambio = grupoDonante[indiceApoyo];
-          grupoDonante[indiceApoyo] = grupo[indiceBDisponible];
-          grupo[indiceBDisponible] = intercambio;
-          return;
+        for (let indiceApoyo = 0; indiceApoyo < grupoDonante.length; indiceApoyo++) {
+          const apoyo = grupoDonante[indiceApoyo];
+          if (apoyo.tipo !== 'A' && apoyo.tipo !== 'C') continue;
+          for (let indiceB = 0; indiceB < grupo.length; indiceB++) {
+            if (grupo[indiceB].tipo !== 'B') continue;
+            if (!intercambioSeguro(grupo, indiceB, grupoDonante, indiceApoyo, mapaIncompatibles)) continue;
+            grupoDonante[indiceApoyo] = grupo[indiceB];
+            grupo[indiceB] = apoyo;
+            return;
+          }
         }
       }
     });
@@ -427,11 +437,28 @@
     asignarAlumnosHeterogeneos(listaA, grupos, capacidades, sobrantes);
     asignarAlumnosHeterogeneos(listaC, grupos, capacidades, sobrantes);
     asignarAlumnosHeterogeneos(listaB, grupos, capacidades, sobrantes);
-    const incompatiblesSet = new Set(mapaIncompatibles.keys());
-    balancearGruposHeterogeneos(grupos, incompatiblesSet);
-    optimizarGruposHeterogeneos(grupos, incompatiblesSet);
+    balancearGruposHeterogeneos(grupos, mapaIncompatibles);
+    optimizarGruposHeterogeneos(grupos, mapaIncompatibles);
     colocarSobrantes(grupos, sobrantes, mapaIncompatibles);
     return grupos.filter(grupo => grupo.length > 0);
+  }
+
+  function dividirGruposGrandes(grupos, numAlumnos) {
+    // Un equipo que acoge a personas sueltas puede pasarse de tamaño; se parte en dos
+    // dejando junto al mayor número posible de personas de la tipología predominante.
+    // Los miembros ya son compatibles entre sí, así que cualquier partición es válida.
+    for (let i = 0; i < grupos.length; i++) {
+      const grupo = grupos[i];
+      if (grupo.length <= numAlumnos + 1) continue;
+      const predominante = tipoPredominante(grupo);
+      const ordenados = [
+        ...grupo.filter(alumno => alumno.tipo === predominante),
+        ...grupo.filter(alumno => alumno.tipo !== predominante)
+      ];
+      const primero = Math.min(numAlumnos, ordenados.length - 2);
+      grupos[i] = ordenados.slice(0, primero);
+      grupos.splice(i + 1, 0, ordenados.slice(primero));
+    }
   }
 
   function generarGruposHomogeneos(listas, numAlumnos, incompatSets, mapaIncompatibles, opcionSobrantes) {
@@ -499,6 +526,7 @@
     }
 
     fusionarGruposUnitarios(grupos, mapaIncompatibles);
+    dividirGruposGrandes(grupos, numAlumnos);
     return grupos;
   }
 

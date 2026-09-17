@@ -1,6 +1,6 @@
 {
   "name": "geco",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Generador de equipos cooperativos para docentes (ESO y Bachillerato).",
   "main": "electron/main.js",
   "author": "Juan José de Haro <jjdeharo@gmail.com>",

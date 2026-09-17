@@ -1241,6 +1241,12 @@
       margin-bottom: 12px;
     }
 
+    .duplicate-warning {
+      color: var(--error-color);
+      font-weight: 600;
+      margin-top: -4px;
+    }
+
     .incompatibles-info.warning {
       color: var(--error-color);
       font-weight: 600;
@@ -1530,6 +1536,7 @@ Javier</textarea>
         <p id="infoTotales" class="info-text-secondary"></p>
       </div>
     </div>
+    <p id="duplicateWarning" class="info-text duplicate-warning" role="alert" hidden></p>
 
     <div class="card incompatibles-card" id="incompatiblesCard">
       <div class="card-header">

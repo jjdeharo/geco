@@ -152,3 +152,73 @@ test('heterogeneous generation still preserves all students when A or C are scar
   assert.deepEqual(namesOf(teams), ['A1', 'B1', 'B2', 'B3', 'B4', 'B5']);
   assert.equal(teams.length, 3);
 });
+
+test('heterogeneous balancing swaps incompatible students when the swap creates no conflict', () => {
+  for (let i = 0; i < 300; i++) {
+    const teams = engine.generateTeams({
+      grupoA: ['A0'],
+      grupoB: ['B0', 'B1', 'B2', 'B3'],
+      grupoC: ['C0'],
+      numAlumnos: 5,
+      tipoGrupo: 'heterogeneos',
+      opcionSobrantes: 'grupoNuevo',
+      incompatibleGroups: [['C0', 'B0'], ['B1', 'B2']]
+    }).teams;
+    assert.equal(teams.length, 2);
+    teams.forEach(team => {
+      assert.ok(team.some(student => student.tipo !== 'B'), 'every team needs an A or a C');
+      assert.ok(team.filter(s => ['C0', 'B0'].includes(s.nombre)).length <= 1);
+      assert.ok(team.filter(s => ['B1', 'B2'].includes(s.nombre)).length <= 1);
+    });
+  }
+});
+
+test('heterogeneous optimisation never joins incompatible students', () => {
+  for (let i = 0; i < 300; i++) {
+    const incompatibleGroups = [['A0', 'C0', 'B0'], ['A1', 'B1'], ['C1', 'B2']];
+    const teams = engine.generateTeams({
+      grupoA: mk('A', 4),
+      grupoB: mk('B', 10),
+      grupoC: mk('C', 4),
+      numAlumnos: 4,
+      tipoGrupo: 'heterogeneos',
+      opcionSobrantes: i % 2 ? 'agregar' : 'grupoNuevo',
+      incompatibleGroups
+    }).teams;
+    assert.equal(teams.flat().length, 18);
+    incompatibleGroups.forEach(group => {
+      teams.forEach(team => {
+        assert.ok(team.filter(s => group.includes(s.nombre)).length <= 1);
+      });
+    });
+    assert.equal(teams.some(team => team.every(s => s.tipo === 'B')), false);
+  }
+});
+
+test('homogeneous generation splits teams that grow too large when absorbing loners', () => {
+  for (let i = 0; i < 100; i++) {
+    const teams = engine.generateTeams({
+      grupoA: mk('A', 6),
+      grupoB: ['B0'],
+      grupoC: ['C0'],
+      numAlumnos: 5,
+      tipoGrupo: 'homogeneos',
+      opcionSobrantes: 'agregar',
+      incompatibleGroups: []
+    }).teams;
+    assert.equal(teams.flat().length, 8);
+    assert.ok(teams.every(team => team.length >= 2 && team.length <= 6));
+    assert.ok(teams.some(team => team.length === 5 && team.every(s => s.tipo === 'A')));
+  }
+  const small = engine.generateTeams({
+    grupoA: ['A0'],
+    grupoB: mk('B', 5),
+    grupoC: [],
+    numAlumnos: 4,
+    tipoGrupo: 'homogeneos',
+    opcionSobrantes: 'agregar',
+    incompatibleGroups: [],
+    random: () => 0
+  }).teams;
+  assert.deepEqual(small.map(t => t.length).sort(), [2, 4]);
+});

@@ -276,10 +276,7 @@ function loadAppState() {
       replaceStudentAssignments(students);
     }
     if (Array.isArray(data.incompatibleGroups)) {
-      const nameSet = new Set((studentAssignments || []).map(s => s.nombre));
-      incompatibleGroups = data.incompatibleGroups
-        .map(g => g.filter(n => nameSet.has(n)))
-        .filter(g => g.length >= 2);
+      incompatibleGroups = sanitiseIncompatibleGroups(data.incompatibleGroups, (studentAssignments || []).map(s => s.nombre));
       refreshIncompatiblesUI();
     }
     // Sincronizar controles del UI con preferencias guardadas
@@ -861,10 +858,7 @@ function applyFullImport() {
 
   // Import incompatibles
   if (withIncompat) {
-    const nameSet = new Set((studentAssignments || []).map(s => s.nombre));
-    incompatibleGroups = incomingIncompat
-      .map(group => group.filter(n => nameSet.has(n)))
-      .filter(group => group.length >= 2);
+    incompatibleGroups = sanitiseIncompatibleGroups(incomingIncompat, (studentAssignments || []).map(s => s.nombre));
     refreshIncompatiblesUI();
   }
 
@@ -1011,11 +1005,56 @@ function downloadAssignmentsAsCsv() {
   URL.revokeObjectURL(url);
 }
 
-function getStudentLists() {
+function getRawStudentLists() {
   const grupoA = parseNames(document.getElementById('grupoA').value);
   const grupoB = parseNames(document.getElementById('grupoB').value);
   const grupoC = parseNames(document.getElementById('grupoC').value);
   return { grupoA, grupoB, grupoC };
+}
+
+// Nombres repetidos (sin distinguir mayúsculas) en cualquiera de los cuadros.
+function findDuplicateNames(lists) {
+  const seen = new Map();
+  const duplicates = [];
+  ['grupoA', 'grupoB', 'grupoC'].forEach(key => {
+    lists[key].forEach(nombre => {
+      const id = nombre.toLowerCase();
+      if (seen.has(id)) {
+        if (!duplicates.includes(seen.get(id))) duplicates.push(seen.get(id));
+      } else {
+        seen.set(id, nombre);
+      }
+    });
+  });
+  return duplicates;
+}
+
+// Listas sin repeticiones, con el mismo criterio que la tabla de tipologías:
+// si un nombre aparece varias veces, se queda con la última aparición.
+function getStudentLists() {
+  const raw = getRawStudentLists();
+  const map = new Map();
+  ['A', 'B', 'C'].forEach(tipo => {
+    raw['grupo' + tipo].forEach(nombre => {
+      map.set(nombre.toLowerCase(), { nombre, tipo });
+    });
+  });
+  const result = { grupoA: [], grupoB: [], grupoC: [] };
+  map.forEach(({ nombre, tipo }) => result['grupo' + tipo].push(nombre));
+  return result;
+}
+
+function updateDuplicateWarning() {
+  const el = document.getElementById('duplicateWarning');
+  if (!el) return;
+  const duplicates = findDuplicateNames(getRawStudentLists());
+  if (duplicates.length === 0) {
+    el.textContent = '';
+    el.hidden = true;
+    return;
+  }
+  el.textContent = t('duplicateNames', { names: duplicates.join(', ') });
+  el.hidden = false;
 }
 
 function getAllStudentsArray() {
@@ -1034,11 +1073,32 @@ function getIncompatibleNamesSet() {
   return new Set(incompatibleGroups.flat());
 }
 
-function syncIncompatibleGroupsWithStudents() {
-  const available = new Set(getAllStudentsArray());
-  incompatibleGroups = incompatibleGroups
-    .map(group => group.filter(name => available.has(name)))
+// Deja solo nombres existentes, sin repetir a nadie dentro de un grupo ni entre grupos.
+function sanitiseIncompatibleGroups(groups, availableNames) {
+  const available = new Set(availableNames);
+  const used = new Set();
+  return (Array.isArray(groups) ? groups : [])
+    .map(group => {
+      if (!Array.isArray(group)) return [];
+      const clean = [];
+      group.forEach(name => {
+        if (typeof name !== 'string') return;
+        const trimmed = name.trim();
+        if (available.has(trimmed) && !used.has(trimmed) && !clean.includes(trimmed)) {
+          clean.push(trimmed);
+        }
+      });
+      if (clean.length >= 2) {
+        clean.forEach(name => used.add(name));
+        return clean;
+      }
+      return [];
+    })
     .filter(group => group.length >= 2);
+}
+
+function syncIncompatibleGroupsWithStudents() {
+  incompatibleGroups = sanitiseIncompatibleGroups(incompatibleGroups, getAllStudentsArray());
 }
 
 function updateIncompatiblesSelect() {
@@ -1265,8 +1325,13 @@ function updateInfoGrupos() {
   const { grupoA, grupoB, grupoC } = getStudentLists();
   const numAlumnos = parseInt(document.getElementById('numAlumnos').value, 10) || 0;
   const totalAlumnos = grupoA.length + grupoB.length + grupoC.length;
-  const numEquipos = numAlumnos > 0 ? Math.floor(totalAlumnos / numAlumnos) : 0;
-  const sobrantes = numAlumnos > 0 ? totalAlumnos % numAlumnos : totalAlumnos;
+  let numEquipos = numAlumnos > 0 ? Math.floor(totalAlumnos / numAlumnos) : 0;
+  let sobrantes = numAlumnos > 0 ? totalAlumnos % numAlumnos : totalAlumnos;
+  if (numEquipos === 0 && totalAlumnos > 0) {
+    // Con menos personas que el tamaño pedido se forma un único equipo más pequeño.
+    numEquipos = 1;
+    sobrantes = 0;
+  }
   document.getElementById('infoGrupos').textContent = t('infoGroups', {
     teams: numEquipos,
     leftovers: sobrantes
@@ -1283,6 +1348,7 @@ function updateInfoGrupos() {
   if (countAEl) countAEl.textContent = t('groupCount', { count: grupoA.length });
   if (countBEl) countBEl.textContent = t('groupCount', { count: grupoB.length });
   if (countCEl) countCEl.textContent = t('groupCount', { count: grupoC.length });
+  updateDuplicateWarning();
   syncIncompatibleGroupsWithStudents();
   const leftoversOption = getCurrentSobrantes();
   updateIncompatiblesInfo(totalAlumnos, numAlumnos, leftoversOption);

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.6.0 — 2026-09-17
+
+- Los nombres repetidos ya no se duplican en los equipos: se avisa bajo los cuadros y se usa la última aparición, igual que en la tabla de tipologías.
+- Los equipos heterogéneos con incompatibilidades reparten mejor el alumnado A y C: los intercambios de equilibrado ahora incluyen a las personas incompatibles cuando el cambio no crea conflicto.
+- Al importar o cargar el estado, las incompatibilidades se limpian: sin nombres desconocidos y sin que una persona esté en dos grupos.
+- En equipos homogéneos con «Agregar a otros equipos», el equipo que acoge a personas sueltas ya no crece sin límite: si supera el tamaño más uno, se parte en dos manteniendo junta a la tipología predominante.
+- El aviso «Equipos: 0» con menos personas que el tamaño pedido ahora indica que se formará un único equipo.
+- Tests nuevos para los tres casos del motor.
+
 ## 2.5.0 — 2026-03-13
 
 - Refactorizado el motor de generación de equipos en un módulo independiente reutilizable.
