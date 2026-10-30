@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.6.1 — 2026-10-30
+
+- Se retira el contador de visitas de la versión web: GeCo ya no envía ningún dato a servidores externos. Los nombres y la configuración se guardan solo en el navegador o en la aplicación de escritorio.
+- Primer registro de decisiones (ADR) en `docs/adr/`.
+
 ## 2.6.0 — 2026-09-17
 
 - Los nombres repetidos ya no se duplican en los equipos: se avisa bajo los cuadros y se usa la última aparición, igual que en la tabla de tipologías.

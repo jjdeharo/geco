@@ -26,7 +26,6 @@ GeCo is an **Electron desktop app** for educators to generate cooperative studen
 | `team-engine.js` | Pure team generation algorithm (UMD, no DOM dependency) |
 | `report-engine.js` | Team validation and report criteria (UMD, no DOM dependency) |
 | `translations.js` | All UI strings for 5 languages (es, ca, gl, eu, en) |
-| `analytics.js` | Privacy-preserving usage tracking (no cookies, no IP) |
 | `electron/main.js` | Electron process: window, menus, IPC handlers |
 | `electron/preload.js` | Context isolation bridge — exposes `window.gecoAPI` |
 

@@ -8,7 +8,7 @@ GeCo es una aplicación web pensada para docentes de ESO y Bachillerato que nece
 - **Gestión de sobrantes**: opción entre crear un equipo nuevo o repartir el exceso entre los equipos existentes.
 - **Informe pedagógico** tras cada generación que avisa de desviaciones respecto al diseño previsto.
 - **Internacionalización**: interfaz disponible en español, catalán, gallego, euskera e inglés.
-- **Estadísticas de uso agregadas** en la versión web pública mediante un sistema propio, sin cookies analíticas ni almacenamiento de IPs.
+- **Sin estadísticas de uso ni conexiones a servidores**: los nombres y la configuración se guardan solo en el navegador o en la aplicación de escritorio.
 
 ## Uso rápido
 1. Abre `index.html` en un navegador moderno.
@@ -29,7 +29,6 @@ Para más detalles didácticos consulta `instr.html`.
 ## Arquitectura actual
 - La interfaz principal vive en `index.html`.
 - La lógica activa del navegador está en `main.js`.
-- El contador público de uso agregado está en `analytics.js`.
 - Las cadenas de la interfaz están centralizadas en `translations.js`.
 - La guía para el usuario está en `instr.html`.
 
@@ -46,15 +45,15 @@ Para más detalles didácticos consulta `instr.html`.
 - Ajusta las plataformas/arquitecturas objetivo editando la sección `build` de `package.json`.
 - Añade recursos adicionales (documentación, plantillas, etc.) actualizando los patrones de `files` en `package.json`.
 
-### Descargas listas (v2.6.0)
+### Descargas listas (v2.6.1)
 Las versiones empaquetadas están en la sección de [Releases](https://github.com/jjdeharo/geco/releases). En cada enlace se indica qué obtendrás al descargarlo:
 
-- **Windows (instalador con asistente)** → [GeCo-Setup-2.6.0.exe](https://github.com/jjdeharo/geco/releases/download/v2.6.0/GeCo-Setup-2.6.0.exe): instala la aplicación en `C:\Archivos de programa\GeCo`, crea accesos directos y gestiona actualizaciones.
-- **Windows (portable)** → [GeCo-2.6.0.exe](https://github.com/jjdeharo/geco/releases/download/v2.6.0/GeCo-2.6.0.exe): ejecutable auto-contenido para llevar en un USB sin instalación.
-- **macOS (Intel y Apple Silicon)** → [GeCo-2.6.0.dmg](https://github.com/jjdeharo/geco/releases/download/v2.6.0/GeCo-2.6.0.dmg): imagen universal, arrástrala a `Aplicaciones`.
-- **macOS (Apple Silicon optimizado)** → [GeCo-2.6.0-arm64.dmg](https://github.com/jjdeharo/geco/releases/download/v2.6.0/GeCo-2.6.0-arm64.dmg): mismo contenido, compilado específicamente para chips M1/M2.
-- **Linux (AppImage)** → [GeCo-2.6.0.AppImage](https://github.com/jjdeharo/geco/releases/download/v2.6.0/GeCo-2.6.0.AppImage): binario portable, marca el archivo como ejecutable y lánzalo sin instalar.
-- **Linux (paquete DEB)** → [geco_2.6.0_amd64.deb](https://github.com/jjdeharo/geco/releases/download/v2.6.0/geco_2.6.0_amd64.deb): instalador para Debian, Ubuntu y derivadas de 64 bits.
+- **Windows (instalador con asistente)** → [GeCo-Setup-2.6.1.exe](https://github.com/jjdeharo/geco/releases/download/v2.6.1/GeCo-Setup-2.6.1.exe): instala la aplicación en `C:\Archivos de programa\GeCo`, crea accesos directos y gestiona actualizaciones.
+- **Windows (portable)** → [GeCo-2.6.1.exe](https://github.com/jjdeharo/geco/releases/download/v2.6.1/GeCo-2.6.1.exe): ejecutable auto-contenido para llevar en un USB sin instalación.
+- **macOS (Intel y Apple Silicon)** → [GeCo-2.6.1.dmg](https://github.com/jjdeharo/geco/releases/download/v2.6.1/GeCo-2.6.1.dmg): imagen universal, arrástrala a `Aplicaciones`.
+- **macOS (Apple Silicon optimizado)** → [GeCo-2.6.1-arm64.dmg](https://github.com/jjdeharo/geco/releases/download/v2.6.1/GeCo-2.6.1-arm64.dmg): mismo contenido, compilado específicamente para chips M1/M2.
+- **Linux (AppImage)** → [GeCo-2.6.1.AppImage](https://github.com/jjdeharo/geco/releases/download/v2.6.1/GeCo-2.6.1.AppImage): binario portable, marca el archivo como ejecutable y lánzalo sin instalar.
+- **Linux (paquete DEB)** → [geco_2.6.1_amd64.deb](https://github.com/jjdeharo/geco/releases/download/v2.6.1/geco_2.6.1_amd64.deb): instalador para Debian, Ubuntu y derivadas de 64 bits.
 
 
 
